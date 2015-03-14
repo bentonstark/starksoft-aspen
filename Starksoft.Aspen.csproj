@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5F228FCD-54F1-491D-93CE-3D768655FADC}</ProjectGuid>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <AssemblyKeyContainerName>
+    </AssemblyKeyContainerName>
+    <AssemblyName>starksoft.aspen</AssemblyName>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Starksoft.Aspen</RootNamespace>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <StartupObject>Starksoft.Net.%28None%29</StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <SignAssembly>false</SignAssembly>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">CLR_4_PLUS</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v4.5' ">CLR_4_PLUS</DefineConstants>
+    <DocumentationFile>bin\Debug\starksoft.aspen.xml</DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>false</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+    <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>TRACE;</DefineConstants>
+    <DocumentationFile>bin\Release\starksoft.aspen.xml</DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>1</WarningLevel>
+    <DebugType>pdbonly</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.6.1.12217, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
+    <Reference Include="System">
+      <Name>System</Name>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.XML" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ArrayBuilder.cs" />
+    <Compile Include="ArrayUtils.cs" />
+    <Compile Include="Crc16.cs" />
+    <Compile Include="Lrc.cs" />
+    <Compile Include="Ftps\EventArgs\ConnectionClosedEventArgs.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsAsynchronousOperationException.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsAuthenticationException.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsBusyException.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsCertificateValidationException.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsCommandNotSupportedException.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsCommandResponseTimeoutException.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsConnectionBrokenException.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsConnectionClosedException.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsConnectionOpenException.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsDataCompressionException.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsDataConnectionException.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsDataConnectionTimeoutException.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsDataTransferException.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsException.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsHashingInvalidAlgorithmException.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsHashingServerBusyException.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsItemParsingException.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsNetworkVersionException.cs" />
+    <Compile Include="Ftps\FtpsFeatureArgument.cs" />
+    <Compile Include="Ftps\FtpsFeatureArgumentCollection.cs" />
+    <Compile Include="Ftps\FtpsFeature.cs" />
+    <Compile Include="Ftps\FtpsFeatureCollection.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsFeatureException.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsHashingException.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsLoginException.cs" />
+    <Compile Include="Ftps\EventArgs\FtpsRequestEventArgs.cs" />
+    <Compile Include="Ftps\EventArgs\FtpsResponseEventArgs.cs" />
+    <Compile Include="Ftps\Exceptions\FtpsResponseException.cs" />
+    <Compile Include="Ftps\Exceptions\FtpSecureConnectionException.cs" />
+    <Compile Include="Ftps\EventArgs\FxpCopyAsyncCompletedEventArgs.cs" />
+    <Compile Include="Ftps\EventArgs\GetDirListAsyncCompletedEventArgs.cs" />
+    <Compile Include="Ftps\EventArgs\GetDirListDeepAsyncCompletedEventArgs.cs" />
+    <Compile Include="Ftps\EventArgs\GetFileAsyncCompletedEventArgs.cs" />
+    <Compile Include="Ftps\EventArgs\OpenAsyncCompletedEventArgs.cs" />
+    <Compile Include="Ftps\EventArgs\PutFileAsyncCompletedEventArgs.cs" />
+    <Compile Include="Ftps\EventArgs\TransferCompleteEventArgs.cs" />
+    <Compile Include="Ftps\EventArgs\TransferProgressEventArgs.cs" />
+    <Compile Include="Ftps\EventArgs\ValidateServerCertificateEventArgs.cs" />
+    <Compile Include="Ftps\FtpsMlsxItem.cs" />
+    <Compile Include="Ftps\FtpsItem.cs" />
+    <Compile Include="Ftps\FtpsMlsxItemParser.cs" />
+    <Compile Include="Ftps\FtpsUtilities.cs" />
+    <Compile Include="Proxy\EventArgs\CreateConnectionAsyncCompletedEventArgs.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Proxy\HttpProxyClient.cs" />
+    <Compile Include="Proxy\IProxyClient.cs" />
+    <Compile Include="Proxy\ProxyClientFactory.cs" />
+    <Compile Include="Proxy\Exceptions\ProxyException.cs" />
+    <Compile Include="Proxy\Socks4aProxyClient.cs" />
+    <Compile Include="Proxy\Socks4ProxyClient.cs" />
+    <Compile Include="Proxy\Socks5ProxyClient.cs" />
+    <Compile Include="Proxy\Utils.cs" />
+    <Compile Include="Crc32.cs" />
+    <Compile Include="Ftps\FtpsBase.cs" />
+    <Compile Include="Ftps\FtpsRequest.cs" />
+    <Compile Include="Ftps\FtpsResponseCollection.cs" />
+    <Compile Include="Ftps\FtpsResponseQueue.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Ftps\FtpsClient.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Ftps\FtpsItemCollection.cs" />
+    <Compile Include="Ftps\IFtpsItemParser.cs" />
+    <Compile Include="Ftps\FtpsListItemParser.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Ftps\FtpsResponse.cs" />
+    <Compile Include="GnuPG\DecryptAsyncCompletedEventArgs.cs" />
+    <Compile Include="GnuPG\EncryptAsyncCompletedEventArgs.cs" />
+    <Compile Include="GnuPG\Gpg.cs" />
+    <Compile Include="GnuPG\GpgBadPassphraseException.cs" />
+    <Compile Include="GnuPG\GpgException.cs" />
+    <Compile Include="GnuPG\GpgKey.cs" />
+    <Compile Include="GnuPG\GpgKeyCollection.cs" />
+    <Compile Include="GnuPG\SignAsyncCompletedEventArgs.cs" />
+    <Compile Include="Smartcard\SCard.cs" />
+    <Compile Include="Smartcard\SCardAdpu.cs" />
+    <Compile Include="Smartcard\SCardAdpuRecv.cs" />
+    <Compile Include="Smartcard\SCardAdpuSend.cs" />
+    <Compile Include="Smartcard\SCardAdpuSendRecv.cs" />
+    <Compile Include="Smartcard\SCardDll.cs" />
+    <Compile Include="Smartcard\SCardException.cs" />
+    <Compile Include="Tests\TestFtpClient.cs" />
+    <Compile Include="Tests\TestFtpMlsx.cs" />
+    <Compile Include="Tests\TestProxyClient.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="COPYING.LESSER" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>
