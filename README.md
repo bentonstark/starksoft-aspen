@@ -1,3 +1,3 @@
 # starksoft-aspen
-cryptography library that support FTPS, GnuPG, Smartbadges, and proxy servers
+cryptography library that includes a FTPS client, GnuPG wrapper, Windows smart badge API, and proxy clients
 
