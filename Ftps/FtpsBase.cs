@@ -900,14 +900,14 @@ namespace Starksoft.Aspen.Ftps
                     hashAlgo = new SHA256CryptoServiceProvider();
                     break;
 #else
-                    throw new FtpException("Sha256 algorithm not supported on this CLR version; recompile with .NET 4.0 or higher");
+                    throw new FtpsException("Sha256 algorithm not supported on this CLR version; recompile with .NET 4.0 or higher");
 #endif
                 case HashingAlgorithm.Sha512:
 #if CLR_4_PLUS
                     hashAlgo = new SHA512CryptoServiceProvider();
                     break;
 #else
-                    throw new FtpException("Sha256 algorithm not supported on this CLR version; recompile with .NET 4.0 or higher");
+                    throw new FtpsException("Sha256 algorithm not supported on this CLR version; recompile with .NET 4.0 or higher");
 #endif
 
             }
