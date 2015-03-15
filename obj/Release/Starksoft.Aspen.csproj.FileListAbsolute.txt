@@ -1,7 +1,0 @@
-C:\Users\bestark\Desktop\Benton Personal\Starksoft, LLC\Starksoft Aspen\starksoft-aspen\bin\Release\starksoft.aspen.xml
-C:\Users\bestark\Desktop\Benton Personal\Starksoft, LLC\Starksoft Aspen\starksoft-aspen\bin\Release\starksoft.aspen.dll
-C:\Users\bestark\Desktop\Benton Personal\Starksoft, LLC\Starksoft Aspen\starksoft-aspen\bin\Release\starksoft.aspen.pdb
-C:\Users\bestark\Desktop\Benton Personal\Starksoft, LLC\Starksoft Aspen\starksoft-aspen\bin\Release\nunit.framework.dll
-C:\Users\bestark\Desktop\Benton Personal\Starksoft, LLC\Starksoft Aspen\starksoft-aspen\bin\Release\nunit.framework.xml
-C:\Users\bestark\Desktop\Benton Personal\Starksoft, LLC\Starksoft Aspen\starksoft-aspen\obj\Release\starksoft.aspen.dll
-C:\Users\bestark\Desktop\Benton Personal\Starksoft, LLC\Starksoft Aspen\starksoft-aspen\obj\Release\starksoft.aspen.pdb
