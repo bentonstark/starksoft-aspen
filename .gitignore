@@ -50,3 +50,5 @@ bin/Release/StarksoftBiko.xml
 obj/Debug/Starksoft Biko.csproj.FileListAbsolute.txt
 obj/Debug/Starksoft.Aspen.csproj.FileListAbsolute.txt
 obj/Release/Starksoft Biko.csproj.FileListAbsolute.txt
+bin/Release/starksoft.aspen.xml
+obj/Release/Starksoft.Aspen.csproj.FileListAbsolute.txt
