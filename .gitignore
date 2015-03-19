@@ -35,20 +35,26 @@ $RECYCLE.BIN/
 .Spotlight-V100
 .Trashes
 
+# User-specific files
+*.suo
+*.user
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+
 # Directories potentially created on remote AFP share
 .AppleDB
 .AppleDesktop
 Network Trash Folder
 Temporary Items
 .apdisk
-bin/Debug/nunit.framework.xml
-bin/Debug/StarksoftBiko.xml
-bin/Debug/StarksoftBiko.dll.VisualState.xml
-bin/Debug/TestResult.xml
-bin/Release/nunit.framework.xml
-bin/Release/StarksoftBiko.xml
-obj/Debug/Starksoft Biko.csproj.FileListAbsolute.txt
-obj/Debug/Starksoft.Aspen.csproj.FileListAbsolute.txt
-obj/Release/Starksoft Biko.csproj.FileListAbsolute.txt
-bin/Release/starksoft.aspen.xml
-obj/Release/Starksoft.Aspen.csproj.FileListAbsolute.txt
