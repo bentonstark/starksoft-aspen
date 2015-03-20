@@ -4,3 +4,7 @@ security and cryptography library that includes a FTPS client, GnuPG wrapper, Wi
 written in c# under LGPL3 
 
 official repository
+
+
+latest nuget image:  
+https://www.nuget.org/packages/starksoft.aspen/
