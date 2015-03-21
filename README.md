@@ -7,6 +7,8 @@ official repository
 nuget image: https://www.nuget.org/packages/starksoft.aspen
 
 FtpsClient Features
+* FTP RFC 959 and RFC 1579
+* FTP over SSL / TLS
 * asynchronous methods
 * active and passive mode
 * configurable active port range
@@ -29,7 +31,6 @@ FtpsClient Features
 * binary or ASCII mode
 * adjust date and time to the correct time zone of local machine
 * SIZE FTP server command to retrieve the size of the file on server
-* Implements RFC 959 and RFC 1579.
 * IPv6 support (EPRT and EPSV)
 * specify IPv4 or IPv6 mode
 * specify a specific client IP address to use with PORT and EPRT commands
