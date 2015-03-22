@@ -22,7 +22,9 @@ Proxy Features
 
 Smartcard Features
 * p/invoke to WINSCARD.DLL
-* send adpu commands to device
+* send adpu commands to device (send and receive)
+* list readers
+* list cards
 
 Ftpsclient Features
 * FTP RFC 959 and RFC 1579
