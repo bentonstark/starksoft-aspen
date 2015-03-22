@@ -6,7 +6,25 @@ official repository
 
 nuget image: https://www.nuget.org/packages/starksoft.aspen
 
-FtpsClient Features
+Gpg Features
+* executes gpg.exe or gpg2.exe to sign, encrypt, decrypt with streams
+* locates the GPG executable via registery or by user supplied path
+* retrieve a collection or DataSet of the keys
+* output ASCII Armor or Binary
+* optional passphrases when decryption data.
+* async methods
+
+Proxy Features
+* SOCKS 4, 4a, 5
+* HTTP proxy
+* factory abstraction
+* open sockets supported by creating Tcpclient object and setting TcpClient.Client = socket and passing in the constructor
+
+Smartcard Features
+* p/invoke to WINSCARD.DLL
+* send adpu commands to device
+
+Ftpsclient Features
 * FTP RFC 959 and RFC 1579
 * FTP over SSL / TLS
 * asynchronous methods
