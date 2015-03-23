@@ -1,9 +1,8 @@
-using System.Reflection;
-using System.Runtime.CompilerServices;
+﻿using System.Reflection;
 using System;
 
 
-[assembly: AssemblyTitle("Starksoft Aspen")]
+[assembly: AssemblyTitle("Starksoft Aspen Tests")]
 [assembly: AssemblyDescription("Cryptography Library")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Starksoft, LLC")]
@@ -18,5 +17,3 @@ using System;
 
 [assembly: System.Runtime.InteropServices.ComVisible(false)]
 [assembly: CLSCompliant(true)]
-namespace Starksoft.Aspen.Ftps
-{ }
