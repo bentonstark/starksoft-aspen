@@ -90,9 +90,6 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework">
-      <HintPath>packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -194,13 +191,9 @@
     <Compile Include="Smartcard\SCardAdpuSendRecv.cs" />
     <Compile Include="Smartcard\SCardDll.cs" />
     <Compile Include="Smartcard\SCardException.cs" />
-    <Compile Include="Tests\TestFtpClient.cs" />
-    <Compile Include="Tests\TestFtpMlsx.cs" />
-    <Compile Include="Tests\TestProxyClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="COPYING.LESSER" />
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
