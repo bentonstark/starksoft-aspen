@@ -134,7 +134,7 @@ namespace Starksoft.Aspen.GnuPG
         private string _homePath;
         private string _binaryPath;
         private OutputTypes _outputType;
-        private OutputSignatureTypes _outputSignatureTypes;
+        private OutputSignatureTypes _outputSignatureType;
 		private int _timeout = 10000; // 10 seconds
 		private Process _proc;
 
@@ -256,6 +256,15 @@ namespace Starksoft.Aspen.GnuPG
         {
             get { return _outputType; }
             set { _outputType = value; }
+        }
+
+        /// <summary>
+        /// The itemType of output signature that GPG should generate.
+        /// </summary>
+        public OutputSignatureTypes OutputSignatureType
+        {
+            get { return _outputSignatureType; }
+            set { _outputSignatureType = value; }
         }
 
         /// <summary>
@@ -478,7 +487,7 @@ namespace Starksoft.Aspen.GnuPG
                     // set local user if specified
                     if (!String.IsNullOrEmpty(_localUser))
                         options.Append(String.Format(CultureInfo.InvariantCulture, "--local-user \"{0}\" ", _localUser));
-                    switch (_outputSignatureTypes)
+                    switch (_outputSignatureType)
                     {
                         case OutputSignatureTypes.ClearText:
                             options.Append("--clearsign ");
