@@ -44,8 +44,27 @@ namespace Starksoft.Aspen.GnuPG
         /// Binary output.
         /// </summary>
         Binary
-    };   
-        
+    };
+
+    /// <summary>
+    /// GnuPG output signature itemType.
+    /// </summary>
+    public enum OutputSignatureTypes
+    {
+        /// <summary>
+        /// Make a clear text signature.
+        /// </summary>
+        ClearText,
+        /// <summary>
+        /// Make a detached signature.
+        /// </summary>
+        Detached,
+        /// <summary>
+        /// Make a signature.
+        /// </summary>
+        Signature
+    };
+
     /// <summary>
     /// Interface class for GnuPG.
     /// </summary>
@@ -110,10 +129,12 @@ namespace Starksoft.Aspen.GnuPG
 	public class Gpg : IDisposable 
 	{
         private string _passphrase;
-        private string _recipient;
-		private string _homePath;
+        private string _recipient; // -r, --recipient USER-ID    encrypt for USER-ID
+        private string _localUser; // -u, --local-user USER-ID   use USER-ID to sign or decrypt
+        private string _homePath;
         private string _binaryPath;
         private OutputTypes _outputType;
+        private OutputSignatureTypes _outputSignatureTypes;
 		private int _timeout = 10000; // 10 seconds
 		private Process _proc;
 
@@ -208,6 +229,15 @@ namespace Starksoft.Aspen.GnuPG
         {
             get { return _recipient; }
             set { _recipient = value; }
+        }
+
+        /// <summary>
+        /// Local user name to sign or decrypt data.
+        /// </summary>
+        public string LocalUser
+        {
+            get { return _localUser; }
+            set { _localUser = value; }
         }
 
         /// <summary>
@@ -430,19 +460,37 @@ namespace Starksoft.Aspen.GnuPG
             switch (action)
             {
                 case ActionTypes.Encrypt:
-                    if (_recipient == null && action == ActionTypes.Encrypt)
-                        throw new GpgException("A Recipient is required before encrypting data.  Please specify a valid recipient using the Recipient property on the GnuPG object.");
+                    if (String.IsNullOrEmpty(_recipient))
+                        throw new GpgException("A Recipient is required before encrypting data. Please specify a valid recipient using the Recipient property on the GnuPG object.");
 
                     //  check to see if the user wants ascii armor output or binary output (binary is the default mode for gpg)
                     if (_outputType == OutputTypes.AsciiArmor)
                         options.Append("--armor ");
-                    options.Append(String.Format(CultureInfo.InvariantCulture, "--recipient \"{0}\" --encrypt", _recipient));
+                    options.Append(String.Format(CultureInfo.InvariantCulture, "--recipient \"{0}\" --encrypt ", _recipient));
                     break;
                 case ActionTypes.Decrypt:
+                    // set local user if specified
+                    if (!String.IsNullOrEmpty(_localUser))
+                        options.Append(String.Format(CultureInfo.InvariantCulture, "--local-user \"{0}\" ", _localUser));
                     options.Append("--decrypt ");
                     break;
                 case ActionTypes.Sign:
-                    options.Append("--sign ");
+                    // set local user if specified
+                    if (!String.IsNullOrEmpty(_localUser))
+                        options.Append(String.Format(CultureInfo.InvariantCulture, "--local-user \"{0}\" ", _localUser));
+                    switch (_outputSignatureTypes)
+                    {
+                        case OutputSignatureTypes.ClearText:
+                            options.Append("--clearsign ");
+                            break;
+                        case OutputSignatureTypes.Detached:
+                            options.Append("--detach-sign ");
+                            break;
+                        case OutputSignatureTypes.Signature:
+                        default:
+                            options.Append("--sign ");
+                            break;
+                    }
                     break;
                 case ActionTypes.Verify:
                     options.Append("--verify ");
