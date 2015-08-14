@@ -116,6 +116,7 @@ namespace Starksoft.Aspen.GnuPG
         private OutputTypes _outputType;
 		private int _timeout = 10000; // 10 seconds
 		private Process _proc;
+        private bool _signAndEncrypt = false;
 
         private Stream _outputStream;
         private Stream _errorStream;
@@ -244,6 +245,27 @@ namespace Starksoft.Aspen.GnuPG
         {
             get { return _binaryPath; }
             set { _binaryPath = value; }
+        }
+
+        /// <summary>
+        /// Should encryption use --sign switch.
+        /// </summary>
+        public bool SignAndEncrypt
+        {
+            get { return _signAndEncrypt; }
+            set { _signAndEncrypt = value; }
+        }
+
+        /// <summary>
+        /// Encrypt OpenPGP data using IO Streams.
+        /// </summary>
+        /// <param name="inputStream">Input stream data containing the data to encrypt.</param>
+        /// <param name="outputStream">Output stream which will contain encrypted data.</param>
+        /// <param name="signAndEncrypt">Should --sign switch be included.</param>
+        public void Encrypt(Stream inputStream, Stream outputStream, bool signAndEncrypt)
+        {
+            _signAndEncrypt = signAndEncrypt;
+            Encrypt(inputStream, outputStream);
         }
 
         /// <summary>
@@ -436,6 +458,8 @@ namespace Starksoft.Aspen.GnuPG
                     //  check to see if the user wants ascii armor output or binary output (binary is the default mode for gpg)
                     if (_outputType == OutputTypes.AsciiArmor)
                         options.Append("--armor ");
+                    if (_signAndEncrypt)
+                        options.Append("--sign ");
                     options.Append(String.Format(CultureInfo.InvariantCulture, "--recipient \"{0}\" --encrypt", _recipient));
                     break;
                 case ActionTypes.Decrypt:
