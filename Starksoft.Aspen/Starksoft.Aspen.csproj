@@ -28,9 +28,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Starksoft.Aspen</RootNamespace>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    <StartupObject>
-    </StartupObject>
-    <FileUpgradeFlags>
+    <StartupObject></StartupObject>    <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
