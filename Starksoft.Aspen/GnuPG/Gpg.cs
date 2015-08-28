@@ -375,6 +375,7 @@ namespace Starksoft.Aspen.GnuPG
         /// Verify signed input stream data with LocalUser user key.
         /// </summary>
         /// <param name="inputStream">Input stream containing signed data to verify.</param>
+        /// <param name="localUser">Use LocalUser to verify.</param>
         public void Verify(Stream inputStream, string localUser)
         {
             _localUser = localUser;
