@@ -117,6 +117,7 @@ namespace Starksoft.Aspen.GnuPG
 		private int _timeout = 10000; // 10 seconds
 		private Process _proc;
         private bool _signAndEncrypt = false;
+        private string _localUser;
 
         private Stream _outputStream;
         private Stream _errorStream;
@@ -257,6 +258,15 @@ namespace Starksoft.Aspen.GnuPG
         }
 
         /// <summary>
+        /// Use LocalUser to sign, verify or decrypt. (--local-user LocalUser)
+        /// </summary>
+        public string LocalUser
+        {
+            get { return _localUser; }
+            set { _localUser = value; }
+        }
+
+        /// <summary>
         /// Encrypt OpenPGP data using IO Streams.
         /// </summary>
         /// <param name="inputStream">Input stream data containing the data to encrypt.</param>
@@ -298,6 +308,18 @@ namespace Starksoft.Aspen.GnuPG
         /// </summary>
         /// <param name="inputStream">Input stream containing encrypted data.</param>
         /// <param name="outputStream">Output stream which will contain decrypted data.</param>
+        /// <param name="localUser">Use LocalUser to decrypt.</param>
+        public void Decrypt(Stream inputStream, Stream outputStream, string localUser)
+        {
+            _localUser = localUser;
+            Decrypt(inputStream, outputStream);
+        }
+
+        /// <summary>
+        /// Decrypt OpenPGP data using IO Streams.
+        /// </summary>
+        /// <param name="inputStream">Input stream containing encrypted data.</param>
+        /// <param name="outputStream">Output stream which will contain decrypted data.</param>
         public void Decrypt(Stream inputStream, Stream outputStream)
         {
             if (inputStream == null)
@@ -314,9 +336,21 @@ namespace Starksoft.Aspen.GnuPG
             
             ExecuteGPG(ActionTypes.Decrypt, inputStream, outputStream);
         }
+        
+        /// <summary>
+        /// Sign input stream data with LocalUser user key.
+        /// </summary>
+        /// <param name="inputStream">Input stream containing data to sign.</param>
+        /// <param name="outputStream">Output stream containing signed data.</param>
+        /// <param name="localUser">Use LocalUser to sign.</param>
+        public void Sign(Stream inputStream, Stream outputStream, string localUser)
+        {
+            _localUser = localUser;
+            Sign(inputStream, outputStream);
+        }
 
         /// <summary>
-        /// Sign input stream data with default user key.
+        /// Sign input stream data.
         /// </summary>
         /// <param name="inputStream">Input stream containing data to sign.</param>
         /// <param name="outputStream">Output stream containing signed data.</param>
@@ -338,7 +372,18 @@ namespace Starksoft.Aspen.GnuPG
         }
 
         /// <summary>
-        /// Verify signed input stream data with default user key.
+        /// Verify signed input stream data with LocalUser user key.
+        /// </summary>
+        /// <param name="inputStream">Input stream containing signed data to verify.</param>
+        /// <param name="localUser">Use LocalUser to verify.</param>
+        public void Verify(Stream inputStream, string localUser)
+        {
+            _localUser = localUser;
+            Verify(inputStream);
+        }
+
+        /// <summary>
+        /// Verify signed input stream data.
         /// </summary>
         /// <param name="inputStream">Input stream containing signed data to verify.</param>
         public void Verify(Stream inputStream)
@@ -472,6 +517,9 @@ namespace Starksoft.Aspen.GnuPG
                     options.Append("--verify ");
                     break;
             }
+
+            if (!string.IsNullOrEmpty(_localUser) && (action != ActionTypes.Encrypt || _signAndEncrypt))
+                options.Append(String.Format(CultureInfo.InvariantCulture," --local-user \"{0}\" ",  _localUser));
 
             return options.ToString();
         }
