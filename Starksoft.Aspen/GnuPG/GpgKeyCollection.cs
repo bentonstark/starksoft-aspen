@@ -66,27 +66,6 @@ namespace Starksoft.Aspen.GnuPG
             _raw = keys.ReadToEnd();
         }
 
-        //private void Fill(StreamReader data)
-        //{
-        //    string line = null;
-        //    line = data.ReadLine();
-        //    line = data.ReadLine();
-        //    do
-        //    {
-        //        string line1 = data.ReadLine();
-        //        string line2 = data.ReadLine();
-        //        string line3 = data.ReadLine();
-        //        while (!data.EndOfStream && !(line3.StartsWith("sub") || line3.StartsWith("ssb")))
-        //        {
-        //            line3 = data.ReadLine();
-        //        }
-        //        GnuPGKey key = new GnuPGKey(String.Format("{0}\r\n{1}\r\n{2}", line1, line2, line3));
-        //        _keyList.Add(key);
-        //        data.ReadLine();
-        //    }
-        //    while (!data.EndOfStream);
-        //}
-
         private void Fill(StreamReader data)
         {
             string text = "";
@@ -97,7 +76,7 @@ namespace Starksoft.Aspen.GnuPG
                 string line = data.ReadLine();
 
                 // skip lines we are not interested in
-                if (!line.StartsWith("pub") && !line.StartsWith("sec") && !line.StartsWith("uid"))
+                if (!line.StartsWith("pub") && !line.StartsWith("sec") && !line.StartsWith("uid") && !line.StartsWith("sub"))
                 {
                     // make sure this isn't the end of a key parsing operation
                     if (text.Length != 0)
@@ -107,7 +86,7 @@ namespace Starksoft.Aspen.GnuPG
                     }
                     continue;
                 }
-                text += line;
+                text += line + Environment.NewLine;
             }
         }
 

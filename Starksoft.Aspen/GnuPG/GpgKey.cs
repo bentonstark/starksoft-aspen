@@ -149,6 +149,13 @@ namespace Starksoft.Aspen.GnuPG
 
             _userName = name.Match(uid).ToString().Trim();
             _userId = userId.Match(uid).ToString();
+            if (string.IsNullOrEmpty(_userName))
+            {
+                Regex rgx = new Regex(@"uid +");
+                _userName = rgx.Replace(uid, "");
+            }
+            Regex rgx2 = new Regex(@"\[.*\] ");
+            _userName = rgx2.Replace(_userName, "");
         }
 
     }
