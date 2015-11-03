@@ -1726,7 +1726,7 @@ namespace Starksoft.Aspen.Ftps
         /// <seealso cref="GetNameList(string)"/>
         public FtpsItemCollection GetDirList()
         {
-            return new FtpsItemCollection(_currentDirectory, base.TransferText(CreateDirListingRequest()), GetItemParser());
+            return new FtpsItemCollection(_currentDirectory, base.TransferText(CreateDirListingRequest("")), GetItemParser());
         }
 
         /// <summary>
@@ -1756,7 +1756,7 @@ namespace Starksoft.Aspen.Ftps
             if (path == null)
                 throw new ArgumentNullException("path");
 
-            return new FtpsItemCollection(path, base.TransferText(CreateDirListingRequest()), GetItemParser());
+            return new FtpsItemCollection(path, base.TransferText(CreateDirListingRequest(path)), GetItemParser());
         }
 
         /// <summary>
@@ -2620,21 +2620,21 @@ namespace Starksoft.Aspen.Ftps
             }
         }
 
-        private FtpsRequest CreateDirListingRequest()
+        private FtpsRequest CreateDirListingRequest(string path)
         {
             switch(_dirListingMethod)
             {
                 case ListingMethod.List:
-                    return new FtpsRequest(base.Encoding, FtpsCmd.List);
+                    return new FtpsRequest(base.Encoding, FtpsCmd.List, path);
                 case ListingMethod.ListAl:
-                    return new FtpsRequest (base.Encoding, FtpsCmd.List, "-al");
+                    return new FtpsRequest (base.Encoding, FtpsCmd.List, "-al", path);
                 case ListingMethod.Mlsx:
-                    return new FtpsRequest(base.Encoding, FtpsCmd.Mlsd);
+                    return new FtpsRequest(base.Encoding, FtpsCmd.Mlsd, path);
                 case ListingMethod.Automatic:
                     if (base.Features.Contains(FtpsCmd.Mlsd) || base.Features.Contains(FtpsCmd.Mlst))
-                        return new FtpsRequest(base.Encoding, FtpsCmd.Mlsd);
+                        return new FtpsRequest(base.Encoding, FtpsCmd.Mlsd, path);
                     else
-                        return new FtpsRequest(base.Encoding, FtpsCmd.List, "-al");
+                        return new FtpsRequest(base.Encoding, FtpsCmd.List, "-al", path);
                 default:
                     throw new FtpsException("unknown directory listing option");
             }
