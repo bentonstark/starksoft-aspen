@@ -509,7 +509,7 @@ namespace Starksoft.Aspen.Ftps
                 case FtpsCmd.Mfct:
                     return BuildResponseArray(FtpsResponseCode.FileStatus);
                 case FtpsCmd.Opts:
-                    return BuildResponseArray(FtpsResponseCode.CommandOkay);
+                    return BuildResponseArray(FtpsResponseCode.CommandOkay, FtpsResponseCode.CommandNotImplementedSuperfluousAtThisSite);
                 case FtpsCmd.Hash:
                     return BuildResponseArray(FtpsResponseCode.FileStatus);
                 case FtpsCmd.Clnt:
