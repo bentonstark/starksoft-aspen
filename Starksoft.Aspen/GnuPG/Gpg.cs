@@ -6,21 +6,21 @@
 * it under the terms of the GNU General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
-* 
+*
 * Starksoft Aspen is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU General Public License
 * along with Starksoft Aspen.  If not, see <http://www.gnu.org/licenses/>.
-*   
+*
 */
 
 using System;
-using System.Text; 
-using System.Diagnostics; 
-using System.IO; 
+using System.Text;
+using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Globalization;
 using Microsoft.Win32;
@@ -44,26 +44,45 @@ namespace Starksoft.Aspen.GnuPG
         /// Binary output.
         /// </summary>
         Binary
-    };   
-        
+    };
+
+    /// <summary>
+    /// GnuPG output signature itemType.
+    /// </summary>
+    public enum OutputSignatureTypes
+    {
+        /// <summary>
+        /// Make a clear text signature.
+        /// </summary>
+        ClearText,
+        /// <summary>
+        /// Make a detached signature.
+        /// </summary>
+        Detached,
+        /// <summary>
+        /// Make a signature.
+        /// </summary>
+        Signature
+    };
+
     /// <summary>
     /// Interface class for GnuPG.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// GNU Privacy Guard from the GNU Project (also called GnuPG or GPG for short) is a highly regarded and supported opensource project that provides a complete and free implementation of the OpenPGP standard as defined by RFC2440. 
-    /// GnuPG allows you to encrypt and sign your data and communication, manage your public and privde OpenPGP keys as well 
-    /// as access modules for all kind of public key directories. GPG.EXE and GPG2.EXE, is a command line tool that is installed with GnuPG and contains features for easy integration with other applications. 
+    /// GNU Privacy Guard from the GNU Project (also called GnuPG or GPG for short) is a highly regarded and supported opensource project that provides a complete and free implementation of the OpenPGP standard as defined by RFC2440.
+    /// GnuPG allows you to encrypt and sign your data and communication, manage your public and privde OpenPGP keys as well
+    /// as access modules for all kind of public key directories. GPG.EXE and GPG2.EXE, is a command line tool that is installed with GnuPG and contains features for easy integration with other applications.
     /// </para>
     /// <para>
     /// The Starksoft OpenPGP Component for .NET provides classes that interface with the GPG.EXE command line tool.  The Starksoft OpenPGP libraries allows any .NET application to use GPG.EXE to encrypt or decypt data using
-    /// .NET IO Streams.  No temporary files are required and everything is handled through streams.  Any .NET Stream object can be used as long as the source stream can be read and the 
-    /// destination stream can be written to.  But, in order for the Starksoft OpenPGP Component for .NET to work you must first install the lastest version of GnuPG which includes GPG.EXE.  
+    /// .NET IO Streams.  No temporary files are required and everything is handled through streams.  Any .NET Stream object can be used as long as the source stream can be read and the
+    /// destination stream can be written to.  But, in order for the Starksoft OpenPGP Component for .NET to work you must first install the lastest version of GnuPG which includes GPG.EXE.
     /// You can obtain the latest version at http://www.gnupg.org/.  See the GPG.EXE or GPG2.EXE tool documentation for information
     /// on how to add keys to the GPG key ring and creating your public and private keys.
     /// </para>
     /// <para>
-    /// If you are new to GnuPG please install the application and then read how to generate new key pair or importing existing OpenPGP keys. 
+    /// If you are new to GnuPG please install the application and then read how to generate new key pair or importing existing OpenPGP keys.
     /// You can rad more about key generation and importing at http://www.gnupg.org/gph/en/manual.html#AEN26
     /// </para>
     /// <para>
@@ -71,14 +90,14 @@ namespace Starksoft.Aspen.GnuPG
     /// <code>
     /// // create a new GnuPG object
     /// GnuPG gpg = new GnuPG();
-    /// // specify a recipient that is already on the key-ring 
+    /// // specify a recipient that is already on the key-ring
     /// gpg.Recipient = "myfriend@domain.com";
     /// // create an IO.Stream object to the source of the data and open it
     /// FileStream sourceFile = new FileStream(@"c:\temp\source.txt", FileMode.Open);
     /// // create an IO.Stream object to a where I want the encrypt data to go
     /// FileStream outputFile = new FileStream(@"c:\temp\output.txt", FileMode.Create);
     /// // encrypt the data using IO Streams - any type of input and output IO Stream can be used
-    /// // as long as the source (input) stream can be read and the destination (output) stream 
+    /// // as long as the source (input) stream can be read and the destination (output) stream
     /// // can be written to
     /// gpg.Encrypt(sourceFile, outputFile);
     /// // close the files
@@ -91,14 +110,14 @@ namespace Starksoft.Aspen.GnuPG
     /// <code>
     /// // create a new GnuPG object
     /// GnuPG gpg = new GnuPG();
-    /// // create an IO.Stream object to the encrypted source of the data and open it 
+    /// // create an IO.Stream object to the encrypted source of the data and open it
     /// FileStream encryptedFile = new FileStream(@"c:\temp\output.txt", FileMode.Open);
     /// // create an IO.Stream object to a where you want the decrypted data to go
     /// FileStream unencryptedFile = new FileStream(@"c:\temp\unencrypted.txt", FileMode.Create);
     /// // specify our secret passphrase (if we have one)
-    /// gpg.Passphrase = "secret passphrase";            
+    /// gpg.Passphrase = "secret passphrase";
     /// // decrypt the data using IO Streams - any type of input and output IO Stream can be used
-    /// // as long as the source (input) stream can be read and the destination (output) stream 
+    /// // as long as the source (input) stream can be read and the destination (output) stream
     /// // can be written to
     /// gpg.Decrypt(encryptedFile, unencryptedFile);
     /// // close the files
@@ -107,13 +126,15 @@ namespace Starksoft.Aspen.GnuPG
     /// </code>
     /// </para>
     /// </remarks>
-	public class Gpg : IDisposable 
+	public class Gpg : IDisposable
 	{
         private string _passphrase;
-        private string _recipient;
-		private string _homePath;
+        private string _recipient; // -r, --recipient USER-ID    encrypt for USER-ID
+        private string _localUser; // -u, --local-user USER-ID   use USER-ID to sign or decrypt
+        private string _homePath;
         private string _binaryPath;
         private OutputTypes _outputType;
+        private OutputSignatureTypes _outputSignatureType;
 		private int _timeout = 10000; // 10 seconds
 		private Process _proc;
         private bool _signAndEncrypt = false;
@@ -133,11 +154,11 @@ namespace Starksoft.Aspen.GnuPG
         /// GnuPG actions.
         /// </summary>
 		private enum ActionTypes
-		{ 
+		{
             /// <summary>
             /// Encrypt data.
             /// </summary>
-			Encrypt, 
+			Encrypt,
             /// <summary>
             /// Decrypt data.
             /// </summary>
@@ -191,7 +212,7 @@ namespace Starksoft.Aspen.GnuPG
         }
 
         /// <summary>
-        /// Get or set the timeout value for the GnuPG operations in milliseconds. 
+        /// Get or set the timeout value for the GnuPG operations in milliseconds.
         /// </summary>
         /// <remarks>
         /// The default timeout is 10000 milliseconds (10 seconds).
@@ -212,6 +233,15 @@ namespace Starksoft.Aspen.GnuPG
         }
 
         /// <summary>
+        /// Local user name to sign or decrypt data.
+        /// </summary>
+        public string LocalUser
+        {
+            get { return _localUser; }
+            set { _localUser = value; }
+        }
+
+        /// <summary>
         /// Secret passphrase text value.
         /// </summary>
         public string Passphrase
@@ -227,6 +257,15 @@ namespace Starksoft.Aspen.GnuPG
         {
             get { return _outputType; }
             set { _outputType = value; }
+        }
+
+        /// <summary>
+        /// The itemType of output signature that GPG should generate.
+        /// </summary>
+        public OutputSignatureTypes OutputSignatureType
+        {
+            get { return _outputSignatureType; }
+            set { _outputSignatureType = value; }
         }
 
         /// <summary>
@@ -311,7 +350,7 @@ namespace Starksoft.Aspen.GnuPG
 
             if (!outputStream.CanWrite)
                 throw new ArgumentException("Argument outputStream must be writable.");
-            
+
             ExecuteGPG(ActionTypes.Decrypt, inputStream, outputStream);
         }
 
@@ -383,7 +422,7 @@ namespace Starksoft.Aspen.GnuPG
 
             // get the full path to either GPG.EXE or GPG2.EXE
             string gpgPath = GetGnuPGPath();
-                        
+
             //  create a process info object with command line options
             ProcessStartInfo procInfo = new ProcessStartInfo(gpgPath, options.ToString());
 
@@ -452,8 +491,8 @@ namespace Starksoft.Aspen.GnuPG
             switch (action)
             {
                 case ActionTypes.Encrypt:
-                    if (_recipient == null && action == ActionTypes.Encrypt)
-                        throw new GpgException("A Recipient is required before encrypting data.  Please specify a valid recipient using the Recipient property on the GnuPG object.");
+                    if (String.IsNullOrEmpty(_recipient))
+                        throw new GpgException("A Recipient is required before encrypting data. Please specify a valid recipient using the Recipient property on the GnuPG object.");
 
                     //  check to see if the user wants ascii armor output or binary output (binary is the default mode for gpg)
                     if (_outputType == OutputTypes.AsciiArmor)
@@ -463,13 +502,31 @@ namespace Starksoft.Aspen.GnuPG
                     options.Append(String.Format(CultureInfo.InvariantCulture, "--recipient \"{0}\" --encrypt", _recipient));
                     break;
                 case ActionTypes.Decrypt:
-                    options.Append("--decrypt ");
+                    // set local user if specified
+                    if (!String.IsNullOrEmpty(_localUser))
+                        options.Append(String.Format(CultureInfo.InvariantCulture, "--local-user \"{0}\" ", _localUser));
+                    options.Append("--decrypt");
                     break;
                 case ActionTypes.Sign:
-                    options.Append("--sign ");
+                    // set local user if specified
+                    if (!String.IsNullOrEmpty(_localUser))
+                        options.Append(String.Format(CultureInfo.InvariantCulture, "--local-user \"{0}\" ", _localUser));
+                    switch (_outputSignatureType)
+                    {
+                        case OutputSignatureTypes.ClearText:
+                            options.Append("--clearsign");
+                            break;
+                        case OutputSignatureTypes.Detached:
+                            options.Append("--detach-sign");
+                            break;
+                        case OutputSignatureTypes.Signature:
+                        default:
+                            options.Append("--sign");
+                            break;
+                    }
                     break;
                 case ActionTypes.Verify:
-                    options.Append("--verify ");
+                    options.Append("--verify");
                     break;
             }
 
@@ -484,10 +541,10 @@ namespace Starksoft.Aspen.GnuPG
 
             //  create a process info object with command line options
 			ProcessStartInfo procInfo = new ProcessStartInfo(gpgPath, GetCmdLineSwitches(action));
-			
+
             //  init the procInfo object
-			procInfo.CreateNoWindow = true; 
-			procInfo.UseShellExecute = false;  
+			procInfo.CreateNoWindow = true;
+			procInfo.UseShellExecute = false;
 			procInfo.RedirectStandardInput = true;
 			procInfo.RedirectStandardOutput = true;
 			procInfo.RedirectStandardError = true;
@@ -500,7 +557,7 @@ namespace Starksoft.Aspen.GnuPG
                 //  push passphrase onto stdin with a CRLF
                 _proc.StandardInput.WriteLine(_passphrase);
                 _proc.StandardInput.Flush();
-                
+
                 _outputStream = outputStream;
                 _errorStream = new MemoryStream();
 
@@ -516,9 +573,9 @@ namespace Starksoft.Aspen.GnuPG
 
                 //  copy the input stream to the process standard input object
                 CopyStream(inputStream, _proc.StandardInput.BaseStream);
-                                
+
                 _proc.StandardInput.Flush();
-               
+
                 // close the process standard input object
                 _proc.StandardInput.Close();
 
@@ -534,13 +591,13 @@ namespace Starksoft.Aspen.GnuPG
                 if (!errorThread.Join(_timeout / 2))
                     errorThread.Abort();
 
-                //  if the process exit code is not 0 then read the error text from the gpg.exe process 
+                //  if the process exit code is not 0 then read the error text from the gpg.exe process
                 if (_proc.ExitCode != 0)
                 {
                     StreamReader rerror = new StreamReader(_errorStream);
                     _errorStream.Position = 0;
                     gpgErrorText = rerror.ReadToEnd();
-                }        
+                }
 
             }
             catch (Exception exp)
@@ -600,7 +657,7 @@ namespace Starksoft.Aspen.GnuPG
                 if (hKeyLM_2 != null)
                     hKeyLM_2.Close();
             }
-            
+
             // try to figure out which path is good
             if (File.Exists(pathv2))
                 return pathv2;
@@ -615,7 +672,7 @@ namespace Starksoft.Aspen.GnuPG
         private void CopyStream(Stream input, Stream output)
         {
             if (_asyncWorker != null && _asyncWorker.CancellationPending)
-                return;                 
+                return;
 
             const int BUFFER_SIZE = 4096;
             byte[] bytes = new byte[BUFFER_SIZE];
@@ -623,7 +680,7 @@ namespace Starksoft.Aspen.GnuPG
             while ((i = input.Read(bytes, 0, bytes.Length)) != 0)
             {
                 if (_asyncWorker != null && _asyncWorker.CancellationPending)
-                    break;                 
+                    break;
                 output.Write(bytes, 0, i);
             }
         }
@@ -633,7 +690,7 @@ namespace Starksoft.Aspen.GnuPG
             _outputType = OutputTypes.AsciiArmor;
         }
 
-        
+
         private void AsyncOutputReader()
         {
             Stream input = _proc.StandardOutput.BaseStream;
@@ -674,7 +731,7 @@ namespace Starksoft.Aspen.GnuPG
 
         /// <summary>
         /// Dispose method for the GnuPG interface class.
-        /// </summary>       
+        /// </summary>
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
@@ -684,7 +741,7 @@ namespace Starksoft.Aspen.GnuPG
                     //  close all the streams except for our the output stream
                     _proc.StandardInput.Close();
                     _proc.StandardOutput.Close();
-                    _proc.StandardError.Close(); 
+                    _proc.StandardError.Close();
                     _proc.Close();
                 }
             }
