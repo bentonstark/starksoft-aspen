@@ -46,7 +46,7 @@ namespace Starksoft.Aspen.Tests
         }
 
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.Tls1OrSsl3Explicit, "test", "test", "FileZilla")]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.Tls1OrSsl3Explicit, "test", "test", "FileZilla")]
         public void TestUserReportedError2(string host, int port, FtpsSecurityProtocol protocol,
             string user, string pwd, string server)
         {
@@ -113,7 +113,7 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
         public void TestChangeDirectory(string host, int port, FtpsSecurityProtocol protocol,
             string user, string pwd, string server)
         {
@@ -168,7 +168,7 @@ namespace Starksoft.Aspen.Tests
         /// Test the FtpsClient
         /// </summary>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "ftp", "ftp", "FileZilla")]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "ftp", "ftp", "FileZilla")]
         public void TestOpen(string host, int port, FtpsSecurityProtocol protocol, 
             string user, string pwd, string server)
         {
@@ -190,9 +190,9 @@ namespace Starksoft.Aspen.Tests
         /// <param name="server"></param>
         /// <param name="connections"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.Tls1Explicit, "test", "test", "FileZilla", 5)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.Ssl3Explicit, "test", "test", "FileZilla", 5)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 5)]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.Tls1Explicit, "test", "test", "FileZilla", 5)]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.Ssl3Explicit, "test", "test", "FileZilla", 5)]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 5)]
         public void TestMultiOpen(string host, int port, FtpsSecurityProtocol protocol,
             string user, string pwd, string server, int connections)
         {
@@ -225,9 +225,9 @@ namespace Starksoft.Aspen.Tests
         /// <param name="server"></param>
         /// <param name="connections"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.Tls1Explicit, "test", "test", "FileZilla", 10)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.Ssl3Explicit, "test", "test", "FileZilla", 10)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 10)]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.Tls1Explicit, "test", "test", "FileZilla", 10)]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.Ssl3Explicit, "test", "test", "FileZilla", 10)]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 10)]
         [TestCase("127.0.0.1", 900, FtpsSecurityProtocol.Tls1Implicit, "testssl", "test", "FileZilla", 1)]
         [TestCase("127.0.0.1", 900, FtpsSecurityProtocol.Ssl3Implicit, "testssl", "test", "FileZilla", 1)]
         public void TestRepeatedOpen(string host, int port, FtpsSecurityProtocol protocol,
@@ -237,11 +237,11 @@ namespace Starksoft.Aspen.Tests
             {
                 using (FtpsClient c = new FtpsClient(host, port, protocol))
                 {
-                    Debug.WriteLine("********** START **********");
+                    Console.WriteLine("********** START **********");
                     c.AlwaysAcceptServerCertificate = true;
                     c.Open(user, pwd);
                     Assert.IsTrue(c.IsConnected);
-                    Debug.WriteLine("********** PASSED **********");
+                    Console.WriteLine("********** PASSED **********");
                 }
             }
         }
@@ -258,7 +258,7 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
         public void TestOpenUsing(string host, int port, FtpsSecurityProtocol protocol,
             string user, string pwd, string server)
         {
@@ -282,7 +282,7 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
         public void TestGetSystemType(string host, int port, FtpsSecurityProtocol protocol,
             string user, string pwd, string server)
         {
@@ -292,8 +292,9 @@ namespace Starksoft.Aspen.Tests
                 c.Open(user, pwd);
                 Assert.IsTrue(c.IsConnected);
                 string r = c.GetSystemType();
-                Assert.IsNotNullOrEmpty(r);
-                Debug.WriteLine("RESULT: " + r);
+				Assert.IsNotNull(r);
+				Assert.IsNotEmpty(r);
+                Console.WriteLine("RESULT: " + r);
             }
         }
 
@@ -308,7 +309,7 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
         public void TestPutFileUnique(string host, int port, FtpsSecurityProtocol protocol,
             string user, string pwd, string server)
         {
@@ -336,7 +337,7 @@ namespace Starksoft.Aspen.Tests
         /// <param name="server"></param>
         /// <param name="fileSize"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 1024 * 1024)]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 1024 * 1024)]
         public void TestPutFileCreate(string host, int port, FtpsSecurityProtocol protocol,
             string user, string pwd, string server, int fileSize)
         {
@@ -394,7 +395,7 @@ namespace Starksoft.Aspen.Tests
         /// <param name="server"></param>
         /// <param name="fileSize"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 1024 * 1024)]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 1024 * 1024)]
         public void TestPutFileCreateNew(string host, int port, FtpsSecurityProtocol protocol,
             string user, string pwd, string server, int fileSize)
         {
@@ -457,7 +458,7 @@ namespace Starksoft.Aspen.Tests
         /// <param name="server"></param>
         /// <param name="fileSize"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 1024 * 1024)]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 1024 * 1024)]
         public void TestPutFileCreateOrAppend(string host, int port, FtpsSecurityProtocol protocol,
             string user, string pwd, string server, int fileSize)
         {
@@ -515,7 +516,7 @@ namespace Starksoft.Aspen.Tests
         /// <param name="server"></param>
         /// <param name="fileSize"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 1024 * 1024)]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 1024 * 1024)]
         public void TestPutFileResume(string host, int port, FtpsSecurityProtocol protocol,
             string user, string pwd, string server, int fileSize)
         {
@@ -583,7 +584,7 @@ namespace Starksoft.Aspen.Tests
         /// <param name="server"></param>
         /// <param name="fileSize"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 1024 * 1024)]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 1024 * 1024)]
         public void TestPutFileResumeCreate(string host, int port, FtpsSecurityProtocol protocol,
             string user, string pwd, string server, int fileSize)
         {
@@ -636,7 +637,7 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
         public void TestQuote(string host, int port, FtpsSecurityProtocol protocol,
             string user, string pwd, string server)
         {
@@ -660,7 +661,7 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
         public void TestNoOp(string host, int port, FtpsSecurityProtocol protocol,
             string user, string pwd, string server)
         {
@@ -683,7 +684,7 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
         public void TestSetOptions(string host, int port, FtpsSecurityProtocol protocol,
             string user, string pwd, string server)
         {
@@ -706,7 +707,7 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
         public void TestUtf8On(string host, int port, FtpsSecurityProtocol protocol,
             string user, string pwd, string server)
         {
@@ -730,7 +731,7 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
         public void TestUtf8On2(string host, int port, FtpsSecurityProtocol protocol,
             string user, string pwd, string server)
         {
@@ -769,7 +770,7 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "ftp", "ftp", "FileZilla")]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
         public void TestGetDirList(string host, int port, FtpsSecurityProtocol protocol,
             string user, string pwd, string server)
         {
@@ -780,15 +781,15 @@ namespace Starksoft.Aspen.Tests
                 Assert.IsTrue(c.IsConnected);
                 FtpsItemCollection lst = c.GetDirList();
 
-                Debug.WriteLine("===================================================");
-                Debug.WriteLine("DIRECTORY DUMP");
-                Debug.WriteLine("===================================================");
+                Console.WriteLine("===================================================");
+                Console.WriteLine("DIRECTORY DUMP");
+                Console.WriteLine("===================================================");
                 foreach (FtpsItem item in lst)
                 {
-                    Debug.WriteLine(item.RawText);
-                    Debug.WriteLine(item.ToString());
+                    Console.WriteLine(item.RawText);
+                    Console.WriteLine(item.ToString());
                 }
-                Debug.WriteLine("===================================================");
+                Console.WriteLine("===================================================");
 
             }
         }
