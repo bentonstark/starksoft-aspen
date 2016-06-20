@@ -1,18 +1,19 @@
 # starksoft-aspen
 security and cryptography library that includes a FTPS client, GnuPG wrapper, Windows smartcard API, and proxy clients
 
-written in c# under LGPL3 
+Written in c# under LGPL3 and testing under .NET 4.0/4.5 and Mono 4.0/4.5.  Compiles with .NET/Mono 2.0+
+
 official repository
 
 nuget image: https://www.nuget.org/packages/starksoft.aspen
 
 Gpg Features
-* executes gpg.exe or gpg2.exe to sign, encrypt, decrypt with streams
-* locates the GPG executable via registery or by user supplied path
+* executes Windows gpg.exe / gpg2.exe or Linux gpg / gpg2 to sign, encrypt, decrypt, verify with streams
 * retrieve a collection or DataSet of the keys
 * output ASCII Armor or Binary
-* optional passphrases when decryption data.
+* optional passphrases when decryption data
 * async methods
+* import public keys
 
 Proxy Features
 * SOCKS 4, 4a, 5
