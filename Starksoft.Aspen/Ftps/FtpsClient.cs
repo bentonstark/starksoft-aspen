@@ -1,21 +1,21 @@
-/*
-* Copyright (c) 2015 Benton Stark
-* This file is part of the Starksoft Aspen library.
-*
-* Starksoft Aspen is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-* 
-* Starksoft Aspen is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
-* along with Starksoft Aspen.  If not, see <http://www.gnu.org/licenses/>.
-*   
-*/
+//
+//  Author:
+//       Benton Stark <benton.stark@gmail.com>
+//
+//  Copyright (c) 2016 Benton Stark
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
 using System.Net;
@@ -470,6 +470,9 @@ namespace Starksoft.Aspen.Ftps
             if (!this.IsConnected)
                 base.OpenCommandConn();
 
+			// mark the connection as opened
+			_opened = true;
+
             // create the LIST and MLSx item parsers
             CreateItemParsers();
 
@@ -498,9 +501,13 @@ namespace Starksoft.Aspen.Ftps
             
             if (CatchUserCancel()) return;
 
-            // mark the connection as opened
-            _opened = true;
         }
+
+		private void VerifyOpened()
+		{
+			if (!_opened)
+				throw new FtpsException("Connection is closed.  Unable to perform action.");
+		}
 
         /// <summary>
         /// Reopens a lost ftp connection.
@@ -510,9 +517,7 @@ namespace Starksoft.Aspen.Ftps
         /// </remarks>
         public void Reopen()
         {
-            if (!_opened)
-                throw new FtpsException("You must use the Open() method before using the Reopen() method.");
-            
+			VerifyOpened();            
             // reopen the connection with the same username and password
             Open(_user, _password);
         }
@@ -524,14 +529,13 @@ namespace Starksoft.Aspen.Ftps
         /// <param name="password">The password for the user.</param>
         public void ChangeUser(string user, string password)
         {
-            if (user == null)
+			if (user == null)
                 throw new ArgumentNullException("user", "must have a value");
-
             if (user.Length == 0)
                 throw new ArgumentException("must have a value", "user");
-
             if (password == null)
                 throw new ArgumentNullException("password", "must have a value");
+			VerifyOpened();            
 
             try
             {
@@ -578,6 +582,7 @@ namespace Starksoft.Aspen.Ftps
         /// <seealso cref="Open"/>
         public void Close()
         {
+			VerifyOpened();            			
             base.CloseAllConnections();
         }
 
@@ -597,9 +602,9 @@ namespace Starksoft.Aspen.Ftps
 
             if (path == null)
                 throw new ArgumentNullException("path");
-
             if (path.Length == 0)
                 throw new ArgumentException("must have a value", "path");
+			VerifyOpened();            
 
             // replace the windows style directory delimiter with a unix style delimiter
             path = path.Replace("\\", "/");
@@ -643,6 +648,7 @@ namespace Starksoft.Aspen.Ftps
                 throw new ArgumentException("must have a value", "path"); 
             // replace the windows style directory delimiter with a unix style delimiter
             path = path.Replace("\\", "/");
+			VerifyOpened();            
 
             try
             {
@@ -665,6 +671,7 @@ namespace Starksoft.Aspen.Ftps
         /// <seealso cref="ChangeDirectoryUp"/>
         public string GetWorkingDirectory()
 		{
+			VerifyOpened();            			
             try
             {
                 base.SendRequest(new FtpsRequest(base.Encoding, FtpsCmd.Pwd));
@@ -703,6 +710,7 @@ namespace Starksoft.Aspen.Ftps
                 throw new ArgumentNullException("path");
             if (path.Length == 0)
                 throw new ArgumentException("must have a value", "path");
+			VerifyOpened();            
 
             try
             {
@@ -722,6 +730,7 @@ namespace Starksoft.Aspen.Ftps
         /// </remarks>
         public void Abort()
         {
+			VerifyOpened();            			
             try
             {
                 base.SendRequest(new FtpsRequest(base.Encoding, FtpsCmd.Abor));
@@ -749,6 +758,7 @@ namespace Starksoft.Aspen.Ftps
                 throw new ArgumentNullException("path");
             if (path.Length == 0)
                 throw new ArgumentException("must contain a value", "path");
+			VerifyOpened();            
 
             try
             {
@@ -782,6 +792,7 @@ namespace Starksoft.Aspen.Ftps
                 throw new ArgumentNullException("toPath");
             if (fromPath.Length == 0)
                 throw new ArgumentException("must contain a value", "toPath");
+			VerifyOpened();            			
 
 			//  retrieve the server file from the current working directory
             MemoryStream ms = new MemoryStream();
@@ -814,6 +825,7 @@ namespace Starksoft.Aspen.Ftps
                 throw new ArgumentNullException("path");
             if (path.Length == 0)
                 throw new ArgumentException("must have a value", "path");
+			VerifyOpened();            			
 
             try
             {
@@ -838,6 +850,7 @@ namespace Starksoft.Aspen.Ftps
         /// </remarks>
 		public string GetHelp()
 		{
+			VerifyOpened();            			
             try
             {
                 base.SendRequest(new FtpsRequest(base.Encoding, FtpsCmd.Help));
@@ -869,6 +882,7 @@ namespace Starksoft.Aspen.Ftps
                 throw new ArgumentException("must contain a value", "fileName");
             if (!base.Features.Contains(FtpsCmd.Mdtm))
                 throw new FtpsCommandNotSupportedException("Cannot get the file date and time information.", FtpsCmd.Mdtm);
+			VerifyOpened();            
 
             try
             {
@@ -905,6 +919,7 @@ namespace Starksoft.Aspen.Ftps
         /// <exception cref="FtpsCommandNotSupportedException"></exception>
         public void SetModifiedDateTime(string path, DateTime dateTime)
         {
+			VerifyOpened();            			
             SetDateTime(path, dateTime, FtpsCmd.Mfmt);
         }
 
@@ -917,7 +932,8 @@ namespace Starksoft.Aspen.Ftps
         /// <exception cref="FtpsCommandNotSupportedException"></exception>
         public void SetCreatedDateTime(string path, DateTime dateTime)
         {
-            SetDateTime(path, dateTime, FtpsCmd.Mfct);
+			VerifyOpened();                        
+			SetDateTime(path, dateTime, FtpsCmd.Mfct);
         }        
 
 
@@ -933,6 +949,7 @@ namespace Starksoft.Aspen.Ftps
         /// </returns>
 		public string GetStatus()
 		{
+			VerifyOpened();            			
             try
             {
                 base.SendRequest(new FtpsRequest(base.Encoding, FtpsCmd.Stat));
@@ -956,6 +973,7 @@ namespace Starksoft.Aspen.Ftps
         /// <seealso cref="GetWorkingDirectory"/>
         public void ChangeDirectoryUp()
 		{
+			VerifyOpened();            			
             try
             {
                 base.SendRequest(new FtpsRequest(base.Encoding, FtpsCmd.Cdup));
@@ -1030,6 +1048,7 @@ namespace Starksoft.Aspen.Ftps
                 throw new ArgumentNullException("path");
             if (path.Length == 0)
                 throw new ArgumentException("must contain a value", "path");
+			VerifyOpened();            
 
             long size = 0;
 
@@ -1092,6 +1111,7 @@ namespace Starksoft.Aspen.Ftps
                 throw new ArgumentNullException("path");
             if (path.Length == 0)
                 throw new ArgumentException("must contain a value", "path");
+			VerifyOpened();            
 
             try
             {
@@ -1116,6 +1136,7 @@ namespace Starksoft.Aspen.Ftps
         /// </remarks>
         public void AllocateStorage(long size)
         {
+			VerifyOpened();            			
             try
             {
                 base.SendRequest(new FtpsRequest(base.Encoding, FtpsCmd.Allo, size.ToString()));
@@ -1139,6 +1160,7 @@ namespace Starksoft.Aspen.Ftps
         /// </remarks>
 		public string GetSystemType()
 		{
+			VerifyOpened();            			
             try
             {
                 base.SendRequest(new FtpsRequest(base.Encoding, FtpsCmd.Syst));
@@ -1174,6 +1196,7 @@ namespace Starksoft.Aspen.Ftps
         {
             if (localPath == null)
                 throw new ArgumentNullException("localPath");
+			VerifyOpened();            			
 
             string fname = "";
             try
@@ -1218,6 +1241,7 @@ namespace Starksoft.Aspen.Ftps
                 throw new ArgumentNullException("inputStream");
             if (!inputStream.CanRead)
                 throw new ArgumentException("must be readable.  The CanRead property must return a value of 'true'.", "inputStream");
+			VerifyOpened();            
 
             string fname = Guid.NewGuid().ToString();
             WriteToLog(String.Format("Action='PutFileUnique';Action='TransferBegin';CurrentDirectory='{0}';FileName='{1}", _currentDirectory, fname));
@@ -1258,6 +1282,8 @@ namespace Starksoft.Aspen.Ftps
             GetFile(remotePath, localPath, FileAction.CreateNew);
         }
 
+
+
         /// <summary>
         /// Retrieves a remote file from the FTP server and writes the data to a local file
         /// specfied in the localPath parameter.
@@ -1288,16 +1314,20 @@ namespace Starksoft.Aspen.Ftps
                 throw new ArgumentException("must contain a value", "localPath");
             if (action == FileAction.None)
                 throw new ArgumentOutOfRangeException("action", "must contain a value other than 'Unknown'");
+			VerifyOpened();            
 
             // if the transfer event is being subscribed or this is a resume action then get the file size
             long remoteSize = -1;
-            if (IsTranferProgressEventSet() || action == FileAction.Resume)
-            {
+
+			// set the transfer size so we can do some calc on percentage completed
+			// in the TransferBytes() method of the base class
+			if (IsTransferProgressEventSet() || action == FileAction.Resume) {
                 // try to get the remote file size 
                 TryGetFileSize(remotePath, out remoteSize);
-                // set the transfer size so we can do some calc on percentage completed
-                // in the TransferBytes() method of the base class
-                SetTransferSize(remoteSize);
+                
+				if (IsTransferProgressEventSet()) {
+					SetTransferSize (remoteSize);
+				}
             }
 
             localPath = CorrectLocalPath(localPath);
@@ -1348,6 +1378,13 @@ namespace Starksoft.Aspen.Ftps
                             if (localFile.Length == remoteSize)
                                 return;
 
+							// attempt to adjust the transfer size
+							if (IsTransferProgressEventSet()) {
+								if (localFile.Length > remoteSize) {
+									SetTransferSize(localFile.Length - remoteSize);
+								}
+							}	
+
                             TransferData(TransferDirection.ToClient, request, localFile, localFile.Length - 1);
                         }
                         break;
@@ -1366,6 +1403,34 @@ namespace Starksoft.Aspen.Ftps
             }
 
             WriteToLog(String.Format("Action='GetFile';Status='TransferSuccess';LocalPath='{0}';RemotePath='{1}';FileAction='{1}'", localPath, remotePath, action.ToString()));
+        }
+
+
+        /// <summary>
+        /// Retrieves a remote file from the FTP server and writes the data to a local stream object
+        /// specfied in the outStream parameter.
+        /// </summary> 
+        /// <param name="remotePath">A path and/or file name to the remote file.</param>
+        /// <param name="outStream">An output stream object used to stream the remote file to the local machine.</param>
+        /// <remarks>
+        /// If the remote path is a file name then the file is downloaded from the FTP server current working directory.  Otherwise a fully qualified
+        /// path for the remote file may be specified.  The output stream must be writeable and can be any stream object.  Finally, the restart parameter
+        /// is used to send a restart command to the FTP server.  The FTP server is instructed to restart the download process at the last position of
+        /// of the output stream.  Not all FTP servers support the restart command.  If the FTP server does not support the restart (REST) command,
+        /// an FtpException error is thrown.
+        /// Note that some FTP servers will not accept a full path.  On those systems you must navigate to
+        /// the directory you wish to get the file using with the ChangeDirectory() or ChangeDirectoryMultiPath()
+        /// method.
+        /// </remarks>
+        /// <seealso cref="GetFileAsync(string, string, FileAction)"/>
+        /// <seealso cref="PutFile(string, string, FileAction)"/>
+        /// <seealso cref="PutFileAsync(string, string, FileAction)"/>
+        /// <seealso cref="MoveFile"/>
+        /// <seealso cref="FxpCopy"/>
+        /// <seealso cref="FxpCopyAsync"/>
+        public void GetFile(string remotePath, Stream outStream)
+        {
+            GetFile(remotePath, outStream, false);
         }
 
         /// <summary>
@@ -1399,38 +1464,70 @@ namespace Starksoft.Aspen.Ftps
                 throw new ArgumentException("must contain a value", "remotePath");
             if (outStream == null)
                 throw new ArgumentNullException("outStream");
-            if (outStream.CanWrite == false)
-                throw new ArgumentException("must be writable.  The CanWrite property must return the value 'true'.", "outStream");
+            if (!outStream.CanWrite)
+                throw new ArgumentException("outStream not writable");
+            VerifyOpened();
 
             // if the transfer event is being subscribed or this is a resume action then get the file size
             long remoteSize = -1;
-            if (IsTranferProgressEventSet() || resume)
+
+            // set the transfer size so we can do some calc on percentage completed
+            // in the TransferBytes() method of the base class
+            if (IsTransferProgressEventSet() || resume)
             {
                 // try to get the remote file size 
                 TryGetFileSize(remotePath, out remoteSize);
-                // set the transfer size so we can do some calc on percentage completed
-                // in the TransferBytes() method of the base class
-                SetTransferSize(remoteSize);
+
+                if (IsTransferProgressEventSet())
+                {
+                    SetTransferSize(remoteSize);
+                }
             }
+
+            WriteToLog(String.Format("Action='GetFile';Status='TransferBegin';LocalPath='{0}';RemotePath='{1}';FileAction='{2}'", "none", remotePath, "GetFileToStream"));
 
             FtpsRequest request = new FtpsRequest(base.Encoding, FtpsCmd.Retr, remotePath);
 
-            if (resume)
+            try
             {
-                //  make sure we have a valid file size
-                if (remoteSize == -1)
-                    throw new FtpsException("unable to determine file size for resume transfer");
 
-                // if the files are the same size then there is nothing to transfer
-                if (outStream.Length == remoteSize)
-                    return;
+                if (resume)
+                {
+                    if (!base.Features.Contains(FtpsCmd.Rest, "STREAM"))
+                        throw new FtpsCommandNotSupportedException("Cannot resume file transfer.", "REST STREAM");
 
-                TransferData(TransferDirection.ToClient, request, outStream, outStream.Length - 1);
+                    //  make sure we have a valid file size
+                    if (remoteSize == -1)
+                        throw new FtpsException("unable to determine file size for resume transfer");
+
+                    // if the files are the same size then there is nothing to transfer
+                    if (outStream.Length == remoteSize)
+                        return;
+
+                    // attempt to adjust the transfer size
+                    if (IsTransferProgressEventSet())
+                    {
+                        if (outStream.Length > remoteSize)
+                        {
+                            SetTransferSize(outStream.Length - remoteSize);
+                        }
+                    }
+
+                    TransferData(TransferDirection.ToClient, request, outStream, outStream.Length - 1);
+
+                }
+                else
+                {
+                    TransferData(TransferDirection.ToClient, request, outStream);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                TransferData(TransferDirection.ToClient, request, outStream);
+                WriteToLog(String.Format("Action='GetFile';Status='TransferError';LocalPath='{0}';RemotePath='{1}';FileAction='{1}';ErrorMessage='{2}", "none", remotePath, "GetFileToStream", ex.Message));
+                throw new FtpsException(String.Format("An unexpected exception occurred while retrieving file '{0}'.", remotePath), base.LastResponse, ex);
             }
+
+            WriteToLog(String.Format("Action='GetFile';Status='TransferSuccess';LocalPath='{0}';RemotePath='{1}';FileAction='{1}'", "none", remotePath, "GetFileToStream"));
         }
 
         /// <summary>
@@ -1452,6 +1549,7 @@ namespace Starksoft.Aspen.Ftps
         {
             if (String.IsNullOrEmpty(path))
                 throw new ArgumentException("must have a value", "path");
+			VerifyOpened();            
 
             // replace the windows style directory delimiter with a unix style delimiter
             path = path.Replace("\\", "/");
@@ -1491,6 +1589,7 @@ namespace Starksoft.Aspen.Ftps
                 throw new ArgumentException("must have a value", "path");
             if (String.IsNullOrEmpty(filename))
                 throw new ArgumentException("must have a value", "filename");
+			VerifyOpened();            
 
             // replace the windows style directory delimiter with a unix style delimiter
             path = path.Replace("\\", "/");
@@ -1547,7 +1646,8 @@ namespace Starksoft.Aspen.Ftps
         /// <seealso cref="GetDirListDeepAsync(string)"/>
         public string GetNameList()
 		{
-            return base.TransferText(new FtpsRequest(base.Encoding, FtpsCmd.Nlst));
+			VerifyOpened();                    
+			return base.TransferText(new FtpsRequest(base.Encoding, FtpsCmd.Nlst));
 		}
 
         /// <summary>
@@ -1573,6 +1673,7 @@ namespace Starksoft.Aspen.Ftps
         {
             if (path == null)
                 throw new ArgumentNullException("path");
+			VerifyOpened();            			
 
             return base.TransferText(new FtpsRequest(base.Encoding, FtpsCmd.Nlst, path));
         }
@@ -1604,6 +1705,7 @@ namespace Starksoft.Aspen.Ftps
         {
             if (path == null)
                 throw new ArgumentNullException("path");
+			VerifyOpened();            			
 
             FtpsRequest r = GetFileInfoRequest(path);
 
@@ -1673,6 +1775,7 @@ namespace Starksoft.Aspen.Ftps
         /// <seealso cref="GetNameList(string)"/>
         public string GetDirListAsText()
 		{
+			VerifyOpened();            			
             return base.TransferText(CreateDirListingRequest());
 		}
 
@@ -1702,6 +1805,7 @@ namespace Starksoft.Aspen.Ftps
 		{
             if (path == null)
                 throw new ArgumentNullException("path");
+			VerifyOpened();            			
 
             return base.TransferText(CreateDirListingRequest());
 		}
@@ -1726,6 +1830,7 @@ namespace Starksoft.Aspen.Ftps
         /// <seealso cref="GetNameList(string)"/>
         public FtpsItemCollection GetDirList()
         {
+			VerifyOpened();            			
             return new FtpsItemCollection(_currentDirectory, base.TransferText(CreateDirListingRequest()), GetItemParser());
         }
 
@@ -1755,8 +1860,9 @@ namespace Starksoft.Aspen.Ftps
 		{
             if (path == null)
                 throw new ArgumentNullException("path");
+			VerifyOpened();            			
 
-            return new FtpsItemCollection(path, base.TransferText(CreateDirListingRequest()), GetItemParser());
+            return new FtpsItemCollection(path, base.TransferText(CreateDirListingRequest(path)), GetItemParser());
         }
 
         /// <summary>
@@ -1785,6 +1891,7 @@ namespace Starksoft.Aspen.Ftps
         {
             if (path == null)
                 throw new ArgumentNullException("path");
+			VerifyOpened();            			
             
             FtpsItemCollection deepCol = new FtpsItemCollection();
             ParseDirListDeep(path, deepCol);
@@ -1807,6 +1914,7 @@ namespace Starksoft.Aspen.Ftps
                 throw new ArgumentNullException("newName", "must have a value");
             if (newName.Length == 0)
                 throw new ArgumentException("must have a value", "newName");
+			VerifyOpened();            			
 
             try
             {
@@ -1843,7 +1951,7 @@ namespace Starksoft.Aspen.Ftps
         /// <seealso cref="Quote(string)"/>
         public string SendCustomCommand(string command)
         {
-            return Quote(command);
+			return Quote(command);
         }
 
         /// <summary>
@@ -1872,6 +1980,7 @@ namespace Starksoft.Aspen.Ftps
                 throw new ArgumentNullException("command");
             if (command.Length < 3)
                 throw new ArgumentException(String.Format("Invalid command '{0}'.", command), "command");
+			VerifyOpened();            			
 
             char[] separator = { ' ' };
             string[] values = command.Split(separator);
@@ -1931,6 +2040,7 @@ namespace Starksoft.Aspen.Ftps
         /// </summary>
         public void NoOperation()
         {
+			VerifyOpened();            			
             try
             {
                 base.SendRequest(new FtpsRequest(base.Encoding, FtpsCmd.Noop));
@@ -1966,6 +2076,7 @@ namespace Starksoft.Aspen.Ftps
                 throw new ArgumentNullException("path");
             if (path.Length == 0)
                 throw new ArgumentException("must have a value", "path");
+			VerifyOpened();            			
 
             try
             {
@@ -1993,6 +2104,7 @@ namespace Starksoft.Aspen.Ftps
                 throw new ArgumentNullException("argument", "must have a value");
             if (argument.Length == 0)
                 throw new ArgumentException("must have a value", "argument");
+			VerifyOpened();            			
 
             base.SendRequest(new FtpsRequest(base.Encoding, FtpsCmd.Site, argument));
         }
@@ -2133,6 +2245,7 @@ namespace Starksoft.Aspen.Ftps
                 throw new ArgumentException("must contain a value", "remotePath");
             if (action == FileAction.None)
                 throw new ArgumentOutOfRangeException("action", "must contain a value other than 'Unknown'");
+			VerifyOpened();            			
 
             // set the inputStream if the user supplied it pointing to the end of the stream
             if (inputStream.CanSeek && inputStream.Position == inputStream.Length)
@@ -2140,11 +2253,10 @@ namespace Starksoft.Aspen.Ftps
 
             WriteToLog(String.Format("Action='PutFile';Status='TransferBegin';RemotePath='{0}';FileAction='{1}'", remotePath, action.ToString()));
 
-            if (IsTranferProgressEventSet() && inputStream.CanSeek)
-            {
-                // set the transfer size so we can do some calc on percentage completed
-                // in the TransferBytes() method of the base class
-                SetTransferSize(inputStream.Length);
+			// set the transfer size so we can do some calc on percentage completed
+			// in the TransferBytes() method of the base class
+			if (IsTransferProgressEventSet()) {
+				SetTransferSize(inputStream.Length);
             }
 
             try
@@ -2176,6 +2288,13 @@ namespace Starksoft.Aspen.Ftps
                         //  if the files are the same size then there is nothing to transfer
                         if (remoteSize == inputStream.Length)
                             return;
+
+						// attempt to adjust the transfer size
+						if (IsTransferProgressEventSet() && inputStream.CanSeek) {
+							if (inputStream.Length > remoteSize) {
+								SetTransferSize(inputStream.Length - remoteSize);
+							}
+						}	
 
                         //  transfer file to the server
                         base.TransferData(TransferDirection.ToServer, new FtpsRequest(base.Encoding, FtpsCmd.Stor, remotePath), inputStream, remoteSize);
@@ -2223,6 +2342,7 @@ namespace Starksoft.Aspen.Ftps
                 throw new FtpsException("The destination object must be open and connected before a transfer between servers can be intitiated.");
             if (String.IsNullOrEmpty(fileName))
                 throw new ArgumentException("must have a value", "fileName");
+			VerifyOpened();            			
 
             //  send command to destination FTP server to get passive port to be used from the source FTP server
             try
@@ -2373,13 +2493,14 @@ namespace Starksoft.Aspen.Ftps
 		{
             if (String.IsNullOrEmpty(parameters))
                 throw new ArgumentException("must have a value", "fileName");
+			VerifyOpened();            			
 
             try
             {
                 base.SendRequest(new FtpsRequest(base.Encoding, FtpsCmd.Opts, parameters));
             }
             catch (FtpsException fex)
-            {
+             {
                 throw new FtpsException("An error occurred while executing the OPTS command.", base.LastResponse, fex);
             }
 
@@ -2622,19 +2743,25 @@ namespace Starksoft.Aspen.Ftps
 
         private FtpsRequest CreateDirListingRequest()
         {
+            return CreateDirListingRequest("");
+        }
+
+
+        private FtpsRequest CreateDirListingRequest(string path)
+        {
             switch(_dirListingMethod)
             {
                 case ListingMethod.List:
-                    return new FtpsRequest(base.Encoding, FtpsCmd.List);
+                    return new FtpsRequest(base.Encoding, FtpsCmd.List, path);
                 case ListingMethod.ListAl:
-                    return new FtpsRequest (base.Encoding, FtpsCmd.List, "-al");
+                    return new FtpsRequest (base.Encoding, FtpsCmd.List, "-al", path);
                 case ListingMethod.Mlsx:
-                    return new FtpsRequest(base.Encoding, FtpsCmd.Mlsd);
+                    return new FtpsRequest(base.Encoding, FtpsCmd.Mlsd, path);
                 case ListingMethod.Automatic:
                     if (base.Features.Contains(FtpsCmd.Mlsd) || base.Features.Contains(FtpsCmd.Mlst))
-                        return new FtpsRequest(base.Encoding, FtpsCmd.Mlsd);
+                        return new FtpsRequest(base.Encoding, FtpsCmd.Mlsd, path);
                     else
-                        return new FtpsRequest(base.Encoding, FtpsCmd.List, "-al");
+                        return new FtpsRequest(base.Encoding, FtpsCmd.List, "-al", path);
                 default:
                     throw new FtpsException("unknown directory listing option");
             }

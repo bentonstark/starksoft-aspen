@@ -1,21 +1,21 @@
-﻿/*
-* Copyright (c) 2015 Benton Stark
-* This file is part of the Starksoft Aspen library.
-*
-* Starksoft Aspen is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-* 
-* Starksoft Aspen is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
-* along with Starksoft Aspen.  If not, see <http://www.gnu.org/licenses/>.
-*   
-*/
+﻿//
+//  Author:
+//       Benton Stark <benton.stark@gmail.com>
+//
+//  Copyright (c) 2016 Benton Stark
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
 using System.Collections.Generic;
@@ -51,7 +51,7 @@ namespace Starksoft.Aspen.Tests
         {
             FtpsMlsxItemParser p = new FtpsMlsxItemParser();
             p.ParseLine(line);
-            Debug.WriteLine(p.ToString());
+            Console.WriteLine(p.ToString());
         }
 
         /// <summary>
@@ -64,16 +64,16 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="method"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "test", "test", ListingMethod.Automatic)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "test", "test", ListingMethod.List)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "test", "test", ListingMethod.ListAl)]
-        [TestCase("127.0.0.1", 21, FtpsSecurityProtocol.None, "test", "test", ListingMethod.Mlsx)]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", ListingMethod.Automatic)]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", ListingMethod.List)]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", ListingMethod.ListAl)]
+        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", ListingMethod.Mlsx)]
         public void TestGetFileInfo(string host, int port, FtpsSecurityProtocol protocol,
             string user, string pwd, ListingMethod method)
         {
             using (FtpsClient c = new FtpsClient(host, port, protocol))
             {
-                Debug.WriteLine("********** BEGINNING **********");
+                Console.WriteLine("********** BEGINNING **********");
                 c.AlwaysAcceptServerCertificate = true;
                 c.DirListingMethod = method;
                 c.Open(user, pwd);
@@ -81,10 +81,11 @@ namespace Starksoft.Aspen.Tests
                 // get information about the root directory
                 FtpsItem m = c.GetFileInfo(".");
                 if (m is FtpsMlsxItem)
-                    Debug.Write(((FtpsMlsxItem)m).ToString());
+                    Console.Write(((FtpsMlsxItem)m).ToString());
                 else
-                    Debug.Write(m.ToString());
-                Debug.WriteLine("********** ENDING **********");
+                    if (m != null)
+                        Console.Write(m.ToString());
+                Console.WriteLine("********** ENDING **********");
             }
         }
 

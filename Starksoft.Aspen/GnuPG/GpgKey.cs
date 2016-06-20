@@ -1,21 +1,21 @@
-/*
-* Copyright (c) 2015 Benton Stark
-* This file is part of the Starksoft Aspen library.
-*
-* Starksoft Aspen is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-* 
-* Starksoft Aspen is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
-* along with Starksoft Aspen.  If not, see <http://www.gnu.org/licenses/>.
-*   
-*/
+//
+//  Author:
+//       Benton Stark <benton.stark@gmail.com>
+//
+//  Copyright (c) 2016 Benton Stark
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
 using System.Collections.Generic;
@@ -30,7 +30,8 @@ namespace Starksoft.Aspen.GnuPG
     public class GpgKey
     {
         private string _key;
-        private DateTime _keyExpiration;
+		private DateTime _keyCreation;
+		private DateTime _keyExpiration;
         private string _userId;
         private string _userName;
         private string _subKey;
@@ -55,7 +56,15 @@ namespace Starksoft.Aspen.GnuPG
             get { return _key; }
         }
 
-        /// <summary>
+		/// <summary>
+		/// Key creation date and time (if available otherwise DateTime.MinValue).
+		/// </summary>
+		public DateTime KeyCreation
+		{
+			get { return _keyCreation; }
+		}
+
+		/// <summary>
         /// Key expiration date and time.
         /// </summary>
         public DateTime KeyExpiration
@@ -103,45 +112,47 @@ namespace Starksoft.Aspen.GnuPG
             get { return _raw; }
         }
 
-        //sec   1024D/543C3595 2006-12-10
-        //uid                  Benton Stark <benton@starksoft.com>
-        //uid       ...
-        //ssb   1024g/42A71AD8 2006-12-10
-        //
-        //pub   1024D/543C3595 2006-12-10
-        //uid                  Benton Stark <benton@starksoft.com>
-        //uid       ...
-        //uid       ...
-        //sub   1024g/42A71AD8 2006-12-10   
-        //
-        //pub   1024D/543C3595 2006-12-10
-        //uid                  Benton Stark <benton@starksoft.com>
-        //uid       ...
-        
+		/// <summary>
+		/// Parse the raw console data as provided by gpg output.
+		/// </summary>
         private void ParseRaw()
         {
-            string[] lines = _raw.Split(new char[] { '\r', '\n' }, 
+			// split the lines either CR or LF and then remove the empty entries
+			// this will allow the solution to work both Linux and Windows 
+			string[] lines = _raw.Split(  new char[] { '\r', '\n' }, 
                             StringSplitOptions.RemoveEmptyEntries);
 
             string[] pub = SplitSpaces(lines[0]);
             string uid = lines[1];
-            string[] sub = SplitSpaces(lines[2]);
+			string[] sub = null;
+			if (lines.Length < 1)
+				sub = SplitSpaces(lines[2]);
                         
             _key = pub[1];
-            _keyExpiration = DateTime.Parse(pub[2]);
-            _subKey = sub[1];
-            _subKeyExpiration = DateTime.Parse(sub[2]);
+			if (pub.Length >= 6) {	
+				if (pub[5].Length > 1)
+					_keyExpiration = DateTime.Parse(pub[5].Substring(0, pub[5].Length-1));
+				_keyCreation = DateTime.Parse(pub[2]);
+			} 
+			else 
+			{
+				_keyExpiration = DateTime.Parse(pub[2]);
+			}
+			// test to see if there is a sub key
+			if (sub != null) {
+				_subKey = sub[1];
+            	_subKeyExpiration = DateTime.Parse(sub[2]);
+			}
 
             ParseUid(uid);
         }
 
         private string[] SplitSpaces(string input)
         {
-            char[] splitChar = { ' '};
+            char[] splitChar = { ' ' };
             return input.Split(splitChar, StringSplitOptions.RemoveEmptyEntries);
         }
-
-     
+             
         private void ParseUid(string uid)
         {
             Regex name = new Regex(@"(?<=uid).*(?=<)");
@@ -149,6 +160,23 @@ namespace Starksoft.Aspen.GnuPG
 
             _userName = name.Match(uid).ToString().Trim();
             _userId = userId.Match(uid).ToString();
+        }
+
+        /// <summary>
+        /// Returns string reprentation of the object.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            StringBuilder s = new StringBuilder();
+            s.AppendFormat("Key: {0}{1}", _key, Environment.NewLine);
+            s.AppendFormat("KeyCreation: {0}{1}", _keyCreation, Environment.NewLine);
+            s.AppendFormat("KeyExpiration: {0}{1}", _keyExpiration, Environment.NewLine);
+            s.AppendFormat("UserId: {0}{1}", _userId, Environment.NewLine);
+            s.AppendFormat("SubKey: {0}{1}", _subKey, Environment.NewLine);
+            s.AppendFormat("SubKeyExpiration: {0}{1}", _subKeyExpiration, Environment.NewLine);
+            s.AppendFormat("Raw: {0}{1}", _raw, Environment.NewLine);
+            return s.ToString();
         }
 
     }

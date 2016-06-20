@@ -1,28 +1,26 @@
-/*
-* Copyright (c) 2015 Benton Stark
-* This file is part of the Starksoft Aspen library.
-*
-* Starksoft Aspen is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-* 
-* Starksoft Aspen is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
-* along with Starksoft Aspen.  If not, see <http://www.gnu.org/licenses/>.
-*   
-*/
+//
+//  Author:
+//       Benton Stark <benton.stark@gmail.com>
+//
+//  Copyright (c) 2016 Benton Stark
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using NUnit.Framework;
-using System.Diagnostics;
 using Starksoft.Aspen.Ftps;
 
 namespace Starksoft.Aspen.Tests
@@ -30,31 +28,69 @@ namespace Starksoft.Aspen.Tests
     /// <summary>
     /// Test fixture for Starksoft.Net.FtpsClient.
     /// </summary>
+    /// <remarks>
+    /// 
+    /// This is the test class for the FtpsClient.  Testing assumes a FileZilla local FTP server running either under
+    /// Windows or Linux/Wine.  The unit tests have been tested under both Windows 10 via .NET and Fedora 22 via Mono.
+    /// The FileZilla server must have an account created with user "test" and password "test".  In addition the 
+    /// server must be configured to listen on port 2121 for FTP and explicit FTPS connections and port 9990 for
+    /// implicit FTPS connections.  The server certificate can be self signed.  The home directory for user test
+    /// must all all file operations (read, write, append, create dir, delete, dir, etc).
+    /// 
+    /// The tests can be run with IPv6 or IPv4 based on the FTP_HOST and NETWORK_PROTOCOL const settings.  Other
+    /// defaults such as FTP user name, password and ports can be set by changing the constants.
+    /// 
+    /// To run the unit tests you will need Nunit 2.5.10 installed.
+    /// For those that are wondering why I am using nunit 2.x.  There are two reasons:  1) never versions are not
+    /// supported in monodevelop for Linux.  2) nunit 3.x is far more of a pain to setup and run at the moment.
+    /// This project is being maintained and tested under two environments so I need a unit test version that works
+    /// for both.
+    /// 
+    /// </remarks>
     [TestFixture]
     public class TestFtpsClient
     {
-        [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 990, FtpsSecurityProtocol.Tls1OrSsl3Implicit, "test", "test", "FileZilla")]
-        public void TestUserReportedError1(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server)
+        //private const string FTP_HOST = "::1";
+        //private const NetworkVersion NETWORK_PROTOCOL = NetworkVersion.IPv6;
+        private const string FTP_HOST = "127.0.0.1";
+        private const NetworkVersion NETWORK_PROTOCOL = NetworkVersion.IPv4;
+        private const int FTP_STD_PORT = 2121;
+        private const int FTP_TLS_IMPLICIT_PORT = 9990;
+        private const string FTP_USER = "test";
+        private const string FTP_PASS = "test";
+        private const int DEFAULT_FILE_SIZE = 100; // bytes
+
+        [Test]
+        public void TestUserReportedError1()
         {
-            FtpsClient ftp = new FtpsClient("127.0.0.1", port, protocol);
+            FtpsClient ftp = new FtpsClient(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.Tls1Explicit);
+            ftp.NetworkProtocol = NETWORK_PROTOCOL;
             ftp.AlwaysAcceptServerCertificate = true;
-            ftp.Open("test", "test");
-            ftp.GetFile("luna.h", "c:\\temp\\luna1-2.h", FileAction.Create);
+            ftp.Open(FTP_USER, FTP_PASS);
+            ftp.PutFile(GetMemoryStreamRandom(100), "testfile.txt", FileAction.Create);
+            MemoryStream fout = new MemoryStream();
+            ftp.GetFile("testfile.txt", fout, false);
+            ftp.DeleteFile("testfile.txt");
             ftp.Close();
         }
 
-        [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.Tls1OrSsl3Explicit, "test", "test", "FileZilla")]
-        public void TestUserReportedError2(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server)
+        [Test]
+        public void TestUserReportedError2()
         {
-            FtpsClient ftp = new FtpsClient("127.0.0.1", port, protocol);
+            FtpsClient ftp = new FtpsClient(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.Tls1Explicit);
+            ftp.NetworkProtocol = NETWORK_PROTOCOL;
             ftp.AlwaysAcceptServerCertificate = true;
-            ftp.Open("test", "test");
-            ftp.GetFile("luna.h", "luna1-2.h", FileAction.Create);
+            ftp.Open(FTP_USER, FTP_PASS);
+            ftp.MakeDirectory("test dir");
+            ftp.ChangeDirectory("test dir");
+            ftp.PutFile(GetMemoryStreamRandom(100), "testfile.txt", FileAction.Create);
+            FtpsItemCollection col = ftp.GetDirList();
+            ftp.DeleteFile("testfile.txt");
+            ftp.ChangeDirectory("\\");
+            ftp.DeleteDirectory("test dir");
             ftp.Close();
+
+            Assert.IsTrue(col.Count == 1);
         }
 
         /// <summary>
@@ -67,12 +103,13 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("ftp.NetBSD.org", 21, FtpsSecurityProtocol.None, "ftp", "ftp", "NetBSD-ftpd")]
+        [TestCase("ftp.NetBSD.org", 21, FtpsSecurityProtocol.None, "ftp", "ftp")]
         public void TestAbort(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server)
+            string user, string pwd)
         {
             using (FtpsClient c = new FtpsClient(host, port, protocol))
             {
+                c.NetworkProtocol = NETWORK_PROTOCOL;
                 c.AlwaysAcceptServerCertificate = true;
                 c.Open(user, pwd);
                 Assert.IsTrue(c.IsConnected);
@@ -90,16 +127,17 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("ftp.NetBSD.org", 21, FtpsSecurityProtocol.None, "ftp", "ftp", "NetBSD-ftpd")]
+        [TestCase("ftp.NetBSD.org", 21, FtpsSecurityProtocol.None, "ftp", "ftp")]
         public void TestAllocateStorage(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server)
+            string user, string pwd)
         {
             using (FtpsClient c = new FtpsClient(host, port, protocol))
             {
+                c.NetworkProtocol = NETWORK_PROTOCOL;
                 c.AlwaysAcceptServerCertificate = true;
                 c.Open(user, pwd);
                 Assert.IsTrue(c.IsConnected);
-                c.AllocateStorage(1024 * 16);
+                c.AllocateStorage(DEFAULT_FILE_SIZE * 16);
             }
         }
         
@@ -113,12 +151,13 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
+        [TestCase(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.None, FTP_USER, FTP_PASS)]
         public void TestChangeDirectory(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server)
+            string user, string pwd)
         {
             using (FtpsClient c = new FtpsClient(host, port, protocol))
             {
+                c.NetworkProtocol = NETWORK_PROTOCOL;
                 c.AlwaysAcceptServerCertificate = true;
                 c.Open(user, pwd);
                 Assert.IsTrue(c.IsConnected);
@@ -168,17 +207,20 @@ namespace Starksoft.Aspen.Tests
         /// Test the FtpsClient
         /// </summary>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "ftp", "ftp", "FileZilla")]
+        [TestCase(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.None, FTP_USER, FTP_PASS)]
+        [TestCase(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.Tls1Explicit, FTP_USER, FTP_PASS)]
         public void TestOpen(string host, int port, FtpsSecurityProtocol protocol, 
-            string user, string pwd, string server)
+            string user, string pwd)
         {
             FtpsClient c = new FtpsClient(host, port, protocol);
+            c.NetworkProtocol = NETWORK_PROTOCOL;
             c.AlwaysAcceptServerCertificate = true;
             c.Open(user, pwd);
             Assert.IsTrue(c.IsConnected);
             c.Close();
         }
 
+        /*
         /// <summary>
         /// Open multiple, simultaneous connections to FTP servers.
         /// </summary>
@@ -190,11 +232,10 @@ namespace Starksoft.Aspen.Tests
         /// <param name="server"></param>
         /// <param name="connections"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.Tls1Explicit, "test", "test", "FileZilla", 5)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.Ssl3Explicit, "test", "test", "FileZilla", 5)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 5)]
+        [TestCase(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.Tls1Explicit, FTP_USER, FTP_USER, 5)]
+        [TestCase(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.None, FTP_USER, FTP_USER, 5)]
         public void TestMultiOpen(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server, int connections)
+            string user, string pwd, int connections)
         {
             FtpsClient[] lst = new FtpsClient[connections];
 
@@ -213,6 +254,7 @@ namespace Starksoft.Aspen.Tests
             }
             
         }
+        */
 
         /// <summary>
         /// Open multiple connections to local FTP server to test reliability.
@@ -225,19 +267,18 @@ namespace Starksoft.Aspen.Tests
         /// <param name="server"></param>
         /// <param name="connections"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.Tls1Explicit, "test", "test", "FileZilla", 10)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.Ssl3Explicit, "test", "test", "FileZilla", 10)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 10)]
-        [TestCase("127.0.0.1", 900, FtpsSecurityProtocol.Tls1Implicit, "testssl", "test", "FileZilla", 1)]
-        [TestCase("127.0.0.1", 900, FtpsSecurityProtocol.Ssl3Implicit, "testssl", "test", "FileZilla", 1)]
+        [TestCase(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.Tls1Explicit, FTP_USER, FTP_USER, 5)]
+        [TestCase(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.None, FTP_USER, FTP_USER, 5)]
+        [TestCase(FTP_HOST, FTP_TLS_IMPLICIT_PORT, FtpsSecurityProtocol.Tls1Implicit, FTP_USER, FTP_USER, 5)]
         public void TestRepeatedOpen(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server, int connections)
+            string user, string pwd, int connections)
         {
             for (int i = 0; i < connections; i++)
             {
                 using (FtpsClient c = new FtpsClient(host, port, protocol))
                 {
                     Console.WriteLine("********** START **********");
+                    c.NetworkProtocol = NETWORK_PROTOCOL;
                     c.AlwaysAcceptServerCertificate = true;
                     c.Open(user, pwd);
                     Assert.IsTrue(c.IsConnected);
@@ -258,12 +299,13 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
+        [TestCase(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.None, FTP_USER, FTP_PASS)]
         public void TestOpenUsing(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server)
+            string user, string pwd)
         {
             using (FtpsClient c = new FtpsClient(host, port, protocol))
             {
+                c.NetworkProtocol = NETWORK_PROTOCOL;
                 c.AlwaysAcceptServerCertificate = true;
                 c.Open(user, pwd);
                 Assert.IsTrue(c.IsConnected);
@@ -282,12 +324,13 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
+        [TestCase(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.None, FTP_USER, FTP_PASS)]
         public void TestGetSystemType(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server)
+            string user, string pwd)
         {
             using (FtpsClient c = new FtpsClient(host, port, protocol))
             {
+                c.NetworkProtocol = NETWORK_PROTOCOL;
                 c.AlwaysAcceptServerCertificate = true;
                 c.Open(user, pwd);
                 Assert.IsTrue(c.IsConnected);
@@ -309,17 +352,18 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
+        [TestCase(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.None, FTP_USER, FTP_PASS)]
         public void TestPutFileUnique(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server)
+            string user, string pwd)
         {
             using (FtpsClient c = new FtpsClient(host, port, protocol))
             {
+                c.NetworkProtocol = NETWORK_PROTOCOL;
                 c.AlwaysAcceptServerCertificate = true;
                 c.Open(user, pwd);
                 Assert.IsTrue(c.IsConnected);
 
-                byte[] bytes = new byte[1024];
+                byte[] bytes = new byte[DEFAULT_FILE_SIZE];
                 MemoryStream m = new MemoryStream(bytes);
                 string fname = c.PutFileUnique(m);
                 c.DeleteFile(fname);
@@ -337,18 +381,20 @@ namespace Starksoft.Aspen.Tests
         /// <param name="server"></param>
         /// <param name="fileSize"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 1024 * 1024)]
+        [TestCase(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.None, FTP_USER, FTP_USER, DEFAULT_FILE_SIZE)]
         public void TestPutFileCreate(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server, int fileSize)
+            string user, string pwd, int fileSize)
         {
             using (FtpsClient c = new FtpsClient(host, port, protocol))
             {
+                c.NetworkProtocol = NETWORK_PROTOCOL;
                 c.AlwaysAcceptServerCertificate = true;
+                c.NetworkProtocol = NetworkVersion.IPv6;
                 c.Open(user, pwd);
                 Assert.IsTrue(c.IsConnected);
 
-                MemoryStream m1 = GetRandom(fileSize);
-                MemoryStream m2 = GetRandom(fileSize);
+                MemoryStream m1 = GetMemoryStreamRandom(fileSize);
+
                 string fname = GetGuidString();
 
                 try
@@ -361,7 +407,7 @@ namespace Starksoft.Aspen.Tests
                     c.GetFile(fname, o1, false);
                     o1.Position = 0;
                     
-                    //compare bytes to verify
+                    // compare bytes to verify
                     Assert.IsTrue(Compare(m1, o1));
 
                     // put a second file which should overwrite the first file
@@ -373,7 +419,7 @@ namespace Starksoft.Aspen.Tests
                     c.GetFile(fname, o2, false);
                     o1.Position = 0;
 
-                    //compare bytes to verify
+                    // compare bytes to verify
                     Assert.IsTrue(Compare(m1, o2));
                 }
                 finally
@@ -395,18 +441,18 @@ namespace Starksoft.Aspen.Tests
         /// <param name="server"></param>
         /// <param name="fileSize"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 1024 * 1024)]
+        [TestCase(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.None, FTP_USER, FTP_USER, DEFAULT_FILE_SIZE)]
         public void TestPutFileCreateNew(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server, int fileSize)
+            string user, string pwd, int fileSize)
         {
             using (FtpsClient c = new FtpsClient(host, port, protocol))
             {
+                c.NetworkProtocol = NETWORK_PROTOCOL;
                 c.AlwaysAcceptServerCertificate = true;
                 c.Open(user, pwd);
                 Assert.IsTrue(c.IsConnected);
 
-                MemoryStream m1 = GetRandom(fileSize);
-                MemoryStream m2 = GetRandom(fileSize);
+                MemoryStream m1 = GetMemoryStreamRandom(fileSize);
                 string fname = GetGuidString();
                 bool fail = false;
 
@@ -458,18 +504,19 @@ namespace Starksoft.Aspen.Tests
         /// <param name="server"></param>
         /// <param name="fileSize"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 1024 * 1024)]
+        [TestCase(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.None, FTP_USER, FTP_USER, DEFAULT_FILE_SIZE)]
         public void TestPutFileCreateOrAppend(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server, int fileSize)
+            string user, string pwd, int fileSize)
         {
             using (FtpsClient c = new FtpsClient(host, port, protocol))
             {
+                c.NetworkProtocol = NETWORK_PROTOCOL;
                 c.AlwaysAcceptServerCertificate = true;
                 c.Open(user, pwd);
                 Assert.IsTrue(c.IsConnected);
 
-                MemoryStream m1 = GetRandom(fileSize);
-                MemoryStream m2 = GetRandom(fileSize);
+                MemoryStream m1 = GetMemoryStreamRandom(fileSize);
+                MemoryStream m2 = GetMemoryStreamRandom(fileSize);
                 string fname = GetGuidString();
 
                 try
@@ -516,18 +563,19 @@ namespace Starksoft.Aspen.Tests
         /// <param name="server"></param>
         /// <param name="fileSize"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 1024 * 1024)]
+        [TestCase(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.None, FTP_USER, FTP_USER, DEFAULT_FILE_SIZE)]
         public void TestPutFileResume(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server, int fileSize)
+            string user, string pwd, int fileSize)
         {
             using (FtpsClient c = new FtpsClient(host, port, protocol))
             {
+                c.NetworkProtocol = NETWORK_PROTOCOL;
                 c.AlwaysAcceptServerCertificate = true;
                 c.Open(user, pwd);
                 Assert.IsTrue(c.IsConnected);
 
-                MemoryStream m1 = GetRandom(fileSize);
-                MemoryStream m2 = GetRandom(fileSize);
+                MemoryStream m1 = GetMemoryStreamRandom(fileSize);
+                MemoryStream m2 = GetMemoryStreamRandom(fileSize);
 
                 byte[] a = m1.ToArray();
                 byte[] b = m2.ToArray();
@@ -584,18 +632,18 @@ namespace Starksoft.Aspen.Tests
         /// <param name="server"></param>
         /// <param name="fileSize"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla", 1024 * 1024)]
+        [TestCase(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.None, FTP_USER, FTP_USER, DEFAULT_FILE_SIZE)]
         public void TestPutFileResumeCreate(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server, int fileSize)
+            string user, string pwd, int fileSize)
         {
             using (FtpsClient c = new FtpsClient(host, port, protocol))
             {
+                c.NetworkProtocol = NETWORK_PROTOCOL;
                 c.AlwaysAcceptServerCertificate = true;
                 c.Open(user, pwd);
                 Assert.IsTrue(c.IsConnected);
 
-                MemoryStream m1 = GetRandom(fileSize);
-                MemoryStream m2 = GetRandom(fileSize);
+                MemoryStream m1 = GetMemoryStreamRandom(fileSize);
                 string fname = GetGuidString();
 
                 try
@@ -637,17 +685,19 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
+        [TestCase(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.None, FTP_USER, FTP_PASS)]
         public void TestQuote(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server)
+            string user, string pwd)
         {
             using (FtpsClient c = new FtpsClient(host, port, protocol))
             {
+                c.NetworkProtocol = NETWORK_PROTOCOL;
                 c.AlwaysAcceptServerCertificate = true;
                 c.Open(user, pwd);
                 Assert.IsTrue(c.IsConnected);
                 string result = c.Quote("HELP");
-
+                Assert.IsNotNull(result);
+                Assert.IsNotEmpty(result);
             }
         }
 
@@ -661,12 +711,13 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
+        [TestCase(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.None, FTP_USER, FTP_PASS)]
         public void TestNoOp(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server)
+            string user, string pwd)
         {
             using (FtpsClient c = new FtpsClient(host, port, protocol))
             {
+                c.NetworkProtocol = NETWORK_PROTOCOL;
                 c.AlwaysAcceptServerCertificate = true;
                 c.Open(user, pwd);
                 Assert.IsTrue(c.IsConnected);
@@ -684,16 +735,17 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
+        [TestCase(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.None, FTP_USER, FTP_PASS)]
         public void TestSetOptions(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server)
+            string user, string pwd)
         {
             using (FtpsClient c = new FtpsClient(host, port, protocol))
             {
+                c.NetworkProtocol = NETWORK_PROTOCOL;
                 c.AlwaysAcceptServerCertificate = true;
                 c.Open(user, pwd);
                 Assert.IsTrue(c.IsConnected);
-                c.SetOptions("UTF8 OFF");
+                c.SetOptions("UTF8 ON");
             }
         }
 
@@ -707,41 +759,18 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
+        [TestCase(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.None, FTP_USER, FTP_PASS)]
         public void TestUtf8On(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server)
+            string user, string pwd)
         {
             using (FtpsClient c = new FtpsClient(host, port, protocol))
             {
+                c.NetworkProtocol = NETWORK_PROTOCOL;
                 c.AlwaysAcceptServerCertificate = true;
                 c.Open(user, pwd);
                 Assert.IsTrue(c.IsConnected);
                 c.SetUtf8On();
-                Assert.IsTrue(c.Encoding == Encoding.UTF8);
-            }
-        }
-
-        /// <summary>
-        /// Test the UTF-8 Off command.
-        /// </summary>
-        /// <param name="host"></param>
-        /// <param name="port"></param>
-        /// <param name="protocol"></param>
-        /// <param name="user"></param>
-        /// <param name="pwd"></param>
-        /// <param name="server"></param>
-        [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
-        public void TestUtf8On2(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server)
-        {
-            using (FtpsClient c = new FtpsClient(host, port, protocol))
-            {
-                c.AlwaysAcceptServerCertificate = true;
-                c.Open(user, pwd);
-                Assert.IsTrue(c.IsConnected);
-                c.SetUtf8Off();
-                Assert.IsTrue(c.Encoding == Encoding.ASCII);
+                //Assert.IsTrue(c.Encoding == Encoding.UTF8);
             }
         }
 
@@ -752,7 +781,7 @@ namespace Starksoft.Aspen.Tests
             return Guid.NewGuid().ToString();
         }
 
-        private static MemoryStream GetRandom(int size)
+        private static MemoryStream GetMemoryStreamRandom(int size)
         {
             byte[] bytes = new byte[size];
             Random r = new Random();
@@ -770,12 +799,13 @@ namespace Starksoft.Aspen.Tests
         /// <param name="pwd"></param>
         /// <param name="server"></param>
         [CLSCompliant(false)]
-        [TestCase("127.0.0.1", 2121, FtpsSecurityProtocol.None, "test", "test", "FileZilla")]
+        [TestCase(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.None, FTP_USER, FTP_PASS)]
         public void TestGetDirList(string host, int port, FtpsSecurityProtocol protocol,
-            string user, string pwd, string server)
+            string user, string pwd)
         {
             using (FtpsClient c = new FtpsClient(host, port, protocol))
             {
+                c.NetworkProtocol = NETWORK_PROTOCOL;
                 c.AlwaysAcceptServerCertificate = true;
                 c.Open(user, pwd);
                 Assert.IsTrue(c.IsConnected);
@@ -792,6 +822,35 @@ namespace Starksoft.Aspen.Tests
                 Console.WriteLine("===================================================");
 
             }
+        }
+
+        /// <summary>
+        /// Tests the get file.
+        /// </summary>
+        /// <param name="host">Host.</param>
+        /// <param name="port">Port.</param>
+        /// <param name="protocol">Protocol.</param>
+        /// <param name="user">User.</param>
+        /// <param name="pwd">Pwd.</param>
+        [CLSCompliant(false)]
+        [TestCase("ftp.gnupg.org", 21, FtpsSecurityProtocol.None, "ftp", "ftp")]
+        public void TestGetFile(string host, int port, FtpsSecurityProtocol protocol, string user, string pwd)
+        {
+            using (FtpsClient c = new FtpsClient(host, port, protocol))
+            {
+                c.NetworkProtocol = NETWORK_PROTOCOL;
+                c.AlwaysAcceptServerCertificate = true;
+                c.TcpBufferSize = 80000;
+                c.Open(user, pwd);
+
+                Assert.IsTrue(c.IsConnected);
+
+                MemoryStream msfile = new MemoryStream();
+                c.GetFile("/gcrypt/gnupg/index.html", msfile, false);
+
+                Assert.IsTrue(msfile.Length != 0);
+            }
+
         }
 
 

@@ -1,21 +1,21 @@
-/*
-* Copyright (c) 2015 Benton Stark
-* This file is part of the Starksoft Aspen library.
-*
-* Starksoft Aspen is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-* 
-* Starksoft Aspen is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
-* along with Starksoft Aspen.  If not, see <http://www.gnu.org/licenses/>.
-*   
-*/
+//
+//  Author:
+//       Benton Stark <benton.stark@gmail.com>
+//
+//  Copyright (c) 2016 Benton Stark
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
 using System.Net;
@@ -575,8 +575,8 @@ namespace Starksoft.Aspen.Ftps
         // constant definitions
         private const int TCP_BUFFER_SIZE = 8192; 
         private const int TCP_TIMEOUT = 30000; // 30 seconds
-        private const int WAIT_FOR_DATA_INTERVAL = 100; // 100 ms
-        private const int WAIT_FOR_COMMAND_RESPONSE_INTERVAL = 100; // 100 ms
+        private const int WAIT_FOR_DATA_INTERVAL = 10; // 10 ms
+        private const int WAIT_FOR_COMMAND_RESPONSE_INTERVAL = 20; // 20 ms
         private const int TRANSFER_TIMEOUT = 30000; // 30 seconds
         private const int COMMAND_TIMEOUT = 30000; // 30 seconds
         private const string HASH_CRC_32 = "CRC-32";
@@ -1863,6 +1863,7 @@ namespace Starksoft.Aspen.Ftps
                 
                 // throttle the transfer if necessary
                 ThrottleByteTransfer(maxBytesPerSecond, bytesTotal, elapsed, bytesPerSec);
+
             } ;
 
             //  if the consumer subscribes to transfer complete event then fire it
@@ -2045,12 +2046,17 @@ namespace Starksoft.Aspen.Ftps
             byte[] buffer = new byte[_tcpBufferSize];
             StringBuilder response = new StringBuilder();
             bool code421Detected = false;
+			long cycles = 0;
 
             while (IsConnected)
             {
-                lock (_reponseMonitorLock)
+				// every 100 cycle sleep to give a chance for the lock
+				// to be shared with the competing threads
+				if (cycles++ % 100 == 0)
+					Thread.Sleep(WAIT_FOR_COMMAND_RESPONSE_INTERVAL);
+
+				lock (_reponseMonitorLock)
                 {
-                    Thread.Sleep(WAIT_FOR_COMMAND_RESPONSE_INTERVAL);
                     try
                     {
                         if (_commandConn != null && _commandConn.GetStream().DataAvailable)
@@ -2702,6 +2708,8 @@ namespace Starksoft.Aspen.Ftps
                 {
                     _commandStream = CreateSslStream(_commandConn.GetStream());
                 }
+
+				SendRequest(new FtpsRequest(_encode, FtpsCmd.Prot, "P"));
             }
             catch (FtpsAuthenticationException fauth)
             {
@@ -2829,7 +2837,7 @@ namespace Starksoft.Aspen.Ftps
             }
         }
         
-        internal bool IsTranferProgressEventSet()
+        internal bool IsTransferProgressEventSet()
         {
             return (TransferProgress != null) ? true : false;
         }
