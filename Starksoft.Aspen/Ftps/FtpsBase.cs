@@ -552,6 +552,10 @@ namespace Starksoft.Aspen.Ftps
         // data compresion specific
         private bool _isCompressionEnabled = false;  // default is no compression
 
+		// SSL/TSL PROT P command option
+		// default requirement for implicit TLS for Filezilla
+		private bool _sendProtPForImplicitSslConnections = true;
+
         // data hashing specific
         private HashingAlgorithm _autoHashAlgorithm = HashingAlgorithm.None; // default is no compression (zlib)
 
@@ -803,8 +807,9 @@ namespace Starksoft.Aspen.Ftps
             if (!_feats.Contains(FtpsCmd.Hash))
                 throw new FtpsCommandNotSupportedException("Cannot set the HASH option on FTP server.", FtpsCmd.Hash);
 
-            // get the hash argument feature from the features collection
-            FtpsFeatureArgument fa = GetHashFeatureArgument(algorithm);
+            // attempt to get the hash argument feature from the features collection
+			// if the feature or algorithm is not available an exception will be thrown
+            GetHashFeatureArgument(algorithm);
 
             string hashArgText = ConvertHashAlgoToTextArg(algorithm);
 
@@ -822,8 +827,8 @@ namespace Starksoft.Aspen.Ftps
             // refresh the features collection
             TryResetFeatures();
             // find the Hash feature argument agains and verify the option has been set properly
-            FtpsFeatureArgument fa2 = GetHashFeatureArgument(algorithm);    
-            if (!fa2.IsDefault)
+            FtpsFeatureArgument fa = GetHashFeatureArgument(algorithm);    
+            if (!fa.IsDefault)
                 throw new FtpsHashingException("Hashing option not set to default by FTP server.");
         }
 
@@ -1441,8 +1446,9 @@ namespace Starksoft.Aspen.Ftps
                 catch (SocketException e)
                 {
                     // 10035 == WSAEWOULDBLOCK
-                    if (!e.NativeErrorCode.Equals(10035))
-                        connected = false;
+					if (!e.NativeErrorCode.Equals (10035)) {
+						connected = false;
+					}
                 }
                 catch (ObjectDisposedException)
                 { }
@@ -1495,6 +1501,25 @@ namespace Starksoft.Aspen.Ftps
                 _alwaysAcceptServerCertificate = value; 
             }
         }
+
+		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="Starksoft.Aspen.Ftps.FtpsBase"/> send prot P for implicit
+		/// ssl connections.
+		/// </summary>
+		/// <remarks>
+		/// Filezilla requires by default PROT P for implicit TLS connections unless disabled in the server settings.  Set
+		/// this option to false if the server you are connecting to can not accept PROT P for implicit connections.
+		/// </remarks>
+		/// <value><c>true</c> if send prot P for implicit ssl connections; otherwise, <c>false</c>.</value>
+		public bool SendProtPForImplicitSslConnections
+		{
+			get { return _sendProtPForImplicitSslConnections; }
+			set { 
+				if (this.IsConnected)
+					throw new FtpsException("SendProtPForImplicitSslConnections property value cannot be changed when the connection is open.");
+				_sendProtPForImplicitSslConnections = value; 
+			}
+		}
 
         /// <summary>
         /// Gets or sets the internal character encoding object use to encode the request and response data.
@@ -2053,6 +2078,7 @@ namespace Starksoft.Aspen.Ftps
 				// every 100 cycle sleep to give a chance for the lock
 				// to be shared with the competing threads
 				if (cycles++ % 100 == 0)
+					cycles = 0; // reset cycles so we don't have a possible overflow 
 					Thread.Sleep(WAIT_FOR_COMMAND_RESPONSE_INTERVAL);
 
 				lock (_reponseMonitorLock)
@@ -2685,7 +2711,8 @@ namespace Starksoft.Aspen.Ftps
                     _commandStream = CreateSslStream(_commandConn.GetStream());
                 }
 
-                SendRequest(new FtpsRequest(_encode, FtpsCmd.Pbsz, "0"));
+				// send a command to the FTP server indicating that traffic is now protected
+				SendRequest(new FtpsRequest(_encode, FtpsCmd.Pbsz, "0"));
                 SendRequest(new FtpsRequest(_encode, FtpsCmd.Prot, "P"));
             }
             catch (FtpsAuthenticationException fauth)
@@ -2709,7 +2736,10 @@ namespace Starksoft.Aspen.Ftps
                     _commandStream = CreateSslStream(_commandConn.GetStream());
                 }
 
-				SendRequest(new FtpsRequest(_encode, FtpsCmd.Prot, "P"));
+				// send a command to the FTP server indicating that traffic is now protected
+				if (_sendProtPForImplicitSslConnections) {
+					SendRequest(new FtpsRequest(_encode, FtpsCmd.Prot, "P"));
+				}
             }
             catch (FtpsAuthenticationException fauth)
             {
@@ -2784,7 +2814,7 @@ namespace Starksoft.Aspen.Ftps
             return zstream;
         }
 
-        private FtpsFeatureArgument GetHashFeatureArgument(HashingAlgorithm algo)
+         private FtpsFeatureArgument GetHashFeatureArgument(HashingAlgorithm algo)
         {
             string argText = ConvertHashAlgoToTextArg(algo);
 

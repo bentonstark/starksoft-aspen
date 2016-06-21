@@ -33,7 +33,6 @@ namespace Starksoft.Aspen.Ftps
     {
         // general information
         private string _name;
-        private string _rawText;
 
         // RFC defined MLSx object facts
         private DateTime? _modified;
@@ -123,8 +122,6 @@ namespace Starksoft.Aspen.Ftps
 
         private void Parse(string line)
         {
-            _rawText = line;
-
             // ex: Type=file;Size=1830;Modify=19940916055648;Perm=r; hatch.c
             // ex: modify=20120822211414;perm=adfr;size=2101;type=file;unique=16UF3F5;UNIX.group=49440;UNIX.mode=0744;UNIX.owner=49440; iphone_settings_icon.jpg
             // ex: modify=20030225143801;perm=adfr;size=503;type=file;unique=12U24470006;UNIX.group=0;UNIX.mode=0644;UNIX.owner=0; welcome.msg

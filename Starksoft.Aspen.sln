@@ -7,6 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Starksoft.Aspen", "Starksof
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Starksoft.Aspen.Test", "Starksoft.Aspen.Test\Starksoft.Aspen.Test.csproj", "{08312AE3-C8D0-419A-86F4-C6D2B228722F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{07F09099-0395-4667-A104-92F1ABA9161E}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +26,11 @@ Global
 		{5F228FCD-54F1-491D-93CE-3D768655FADC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F228FCD-54F1-491D-93CE-3D768655FADC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F228FCD-54F1-491D-93CE-3D768655FADC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		version = 1.1.1
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

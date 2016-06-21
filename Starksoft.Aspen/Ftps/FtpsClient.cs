@@ -505,7 +505,7 @@ namespace Starksoft.Aspen.Ftps
 
 		private void VerifyOpened()
 		{
-			if (!_opened)
+			if (!_opened || !base.IsConnected)
 				throw new FtpsException("Connection is closed.  Unable to perform action.");
 		}
 
@@ -582,8 +582,8 @@ namespace Starksoft.Aspen.Ftps
         /// <seealso cref="Open"/>
         public void Close()
         {
-			VerifyOpened();            			
             base.CloseAllConnections();
+			_opened = false;
         }
 
         /// <summary>
