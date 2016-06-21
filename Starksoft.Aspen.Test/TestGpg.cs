@@ -44,8 +44,8 @@ namespace Starksoft.Aspen.Tests
     /// 
     /// </remarks>
     [TestFixture]
-	public class TestGpg
-	{
+    public class TestGpg
+    {
         private const String HOME_PATH = "~/";
 #if WIN
         private const String GPG_BINARY_PATH = "C:\\Program Files (x86)\\GNU\\GnuPG\\gpg2.exe";
@@ -91,21 +91,21 @@ namespace Starksoft.Aspen.Tests
 
         }
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Starksoft.Aspen.Tests.TestGpg"/> class.
-		/// </summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Starksoft.Aspen.Tests.TestGpg"/> class.
+        /// </summary>
         [Test]
         public void TestGetKeys()
-		{
+        {
             Gpg g = new Gpg(GPG_BINARY_PATH);
-			GpgKeyCollection col = g.GetKeys();
+            GpgKeyCollection col = g.GetKeys();
 
             Debug.WriteLine("count: " + col.Count.ToString());
 
-			foreach (GpgKey k in col) {
+            foreach (GpgKey k in col) {
                PrintKey(k);
             }
-		}
+        }
 
         private void PrintKey(GpgKey key)
         {

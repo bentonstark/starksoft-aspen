@@ -46,24 +46,24 @@ namespace Starksoft.Aspen.GnuPG
         Binary
     };   
         
-	/// <summary>
-	/// GnuPG output signature type.
-	/// </summary>
-	public enum OutputSignatureTypes
-	{
-		/// <summary>
-		/// Make a clear text signature.
-		/// </summary>
-		ClearText,
-		/// <summary>
-		/// Make a detached signature.
-		/// </summary>
-		Detached,
-		/// <summary>
-		/// Make a signature.
-		/// </summary>
-		Signature
-	};
+    /// <summary>
+    /// GnuPG output signature type.
+    /// </summary>
+    public enum OutputSignatureTypes
+    {
+        /// <summary>
+        /// Make a clear text signature.
+        /// </summary>
+        ClearText,
+        /// <summary>
+        /// Make a detached signature.
+        /// </summary>
+        Detached,
+        /// <summary>
+        /// Make a signature.
+        /// </summary>
+        Signature
+    };
 
 
     /// <summary>
@@ -129,25 +129,24 @@ namespace Starksoft.Aspen.GnuPG
     /// </code>
     /// </para>
     /// </remarks>
-	public class Gpg : IDisposable 
-	{
-		private const long DEFAULT_COPY_BUFFER_SIZE = 4096;
-		private const int DEFAULT_TIMEOUT_MS = 10000; // 10 seconds
-		private const OutputTypes DEFAULT_OUTPUT_TYPE = OutputTypes.AsciiArmor;
-		private const OutputSignatureTypes DEFAULT_SIGNATURE_TYPE = OutputSignatureTypes.Signature;
-
+    public class Gpg : IDisposable 
+    {
+        private const long DEFAULT_COPY_BUFFER_SIZE = 4096;
+        private const int DEFAULT_TIMEOUT_MS = 10000; // 10 seconds
+        private const OutputTypes DEFAULT_OUTPUT_TYPE = OutputTypes.AsciiArmor;
+        private const OutputSignatureTypes DEFAULT_SIGNATURE_TYPE = OutputSignatureTypes.Signature;
         private string _passphrase;
         private string _recipient;
-		private string _localUser;
-		private string _homePath;
+        private string _localUser;
+        private string _homePath;
         private string _binaryPath;
-		private OutputTypes _outputType = DEFAULT_OUTPUT_TYPE;
-		private int _timeout = DEFAULT_TIMEOUT_MS; 
-		private Process _proc;
-		private OutputSignatureTypes _outputSignatureType = DEFAULT_SIGNATURE_TYPE;
-		private string _filename;
-		private long _copyBufferSize = DEFAULT_COPY_BUFFER_SIZE;
-		private bool _ignoreErrors;
+        private OutputTypes _outputType = DEFAULT_OUTPUT_TYPE;
+        private int _timeout = DEFAULT_TIMEOUT_MS; 
+        private Process _proc;
+        private OutputSignatureTypes _outputSignatureType = DEFAULT_SIGNATURE_TYPE;
+        private string _filename;
+        private long _copyBufferSize = DEFAULT_COPY_BUFFER_SIZE;
+        private bool _ignoreErrors;
 
         private Stream _outputStream;
         private Stream _errorStream;
@@ -155,16 +154,16 @@ namespace Starksoft.Aspen.GnuPG
         /// <summary>
         /// GnuPG actions.
         /// </summary>
-		private enum ActionTypes
-		{ 
+        private enum ActionTypes
+        { 
             /// <summary>
             /// Encrypt data.
             /// </summary>
-			Encrypt, 
+            Encrypt, 
             /// <summary>
             /// Decrypt data.
             /// </summary>
-			Decrypt,
+            Decrypt,
             /// <summary>
             /// Sign data.
             /// </summary>
@@ -172,21 +171,20 @@ namespace Starksoft.Aspen.GnuPG
             /// <summary>
             /// Verify signed data.  
             /// </summary>
-			/// <remarks>
-			/// Note that gpg does not support decrypt+verify.  These operations
-			/// must be done separately.
-			/// </remarks>
+            /// <remarks>
+            /// Note that gpg does not support decrypt+verify.  These operations
+            /// must be done separately.
+            /// </remarks>
             Verify,
-			/// <summary>
-			/// Sign and encrypt data.
-			/// </summary>
-			SignEncrypt,
-			/// <summary>
-			/// Import a 
-			/// </summary>
-			Import
-
-		};
+            /// <summary>
+            /// Sign and encrypt data.
+            /// </summary>
+            SignEncrypt,
+            /// <summary>
+            /// Import a key.
+            /// </summary>
+            Import
+        };
 
         /// <summary>
         /// GnuPG interface class default constructor.
@@ -195,28 +193,28 @@ namespace Starksoft.Aspen.GnuPG
         /// The GPG executable location is obtained by information in the windows registry.  Home path is set to the same as the
         /// GPG executable path.  Output itemType defaults to Ascii Armour.
         /// </remarks>
-     	public Gpg()
-		{  }
+        public Gpg()
+        {  }
 
         /// <summary>
         /// GnuPG interface class constuctor.
         /// </summary>
         /// <remarks>Output itemType defaults to Ascii Armour.</remarks>
-		/// <param name="gpgBinaryPath">Full path to the gpg, gpg2, gpg.exe or gpg2.exe executable binary.</param>
-		/// <param name="gpgHomePath">The home directory where files to encrypt and decrypt are located.</param>
-		public Gpg(string gpgBinaryPath, string gpgHomePath)
-		{
-			_binaryPath = gpgBinaryPath;
-			_homePath = gpgHomePath;
-		}
+        /// <param name="gpgBinaryPath">Full path to the gpg, gpg2, gpg.exe or gpg2.exe executable binary.</param>
+        /// <param name="gpgHomePath">The home directory where files to encrypt and decrypt are located.</param>
+        public Gpg(string gpgBinaryPath, string gpgHomePath)
+        {
+            _binaryPath = gpgBinaryPath;
+            _homePath = gpgHomePath;
+        }
 
         /// <summary>
         /// GnuPG interface class constuctor.
         /// </summary>
-		/// <param name="gpgBinaryPath">Full path to the gpg, gpg2, gpg.exe or gpg2.exe executable binary.</param>
+        /// <param name="gpgBinaryPath">Full path to the gpg, gpg2, gpg.exe or gpg2.exe executable binary.</param>
         public Gpg(string gpgBinaryPath)
         {
-			_binaryPath = gpgBinaryPath;
+            _binaryPath = gpgBinaryPath;
         }
 
         /// <summary>
@@ -225,15 +223,15 @@ namespace Starksoft.Aspen.GnuPG
         /// <remarks>
         /// The default timeout is 10000 milliseconds (10 seconds).
         /// </remarks>
-		public int Timeout
-		{
-			get{ return(_timeout);	}
-			set{ _timeout = value;	}
-		}
+        public int Timeout
+        {
+            get{ return(_timeout);	}
+            set{ _timeout = value;	}
+        }
 
         /// <summary>
         /// Gets or set the recipient name to an associated public key.  This selected key will
-		/// be used to encrypt data.
+        /// be used to encrypt data.
         /// </summary>
         public string Recipient
         {
@@ -241,15 +239,15 @@ namespace Starksoft.Aspen.GnuPG
             set { _recipient = value; }
         }
 
-		/// <summary>
-		/// Gets or set the local user name to an associated private key.  This selected key will
-		/// be used to sign or decrypt data.
-		/// </summary>
-		public string LocalUser
-		{
-			get { return _localUser; }
-			set { _localUser = value; }
-		}
+        /// <summary>
+        /// Gets or set the local user name to an associated private key.  This selected key will
+        /// be used to sign or decrypt data.
+        /// </summary>
+        public string LocalUser
+        {
+            get { return _localUser; }
+            set { _localUser = value; }
+        }
 
         /// <summary>
         /// Gets or set the secret passphrase text value used to gain access to the secret key.
@@ -287,74 +285,74 @@ namespace Starksoft.Aspen.GnuPG
             set { _binaryPath = value; }
         }
 
-		/// <summary>
-		/// Gets or sets the output signature that GPG should generate.
-		/// </summary>
-		public OutputSignatureTypes OutputSignatureType
-		{
-		    get { return _outputSignatureType; }
-		    set { _outputSignatureType = value; }
-		}
+        /// <summary>
+        /// Gets or sets the output signature that GPG should generate.
+        /// </summary>
+        public OutputSignatureTypes OutputSignatureType
+        {
+            get { return _outputSignatureType; }
+            set { _outputSignatureType = value; }
+        }
 
-		/// <summary>
-		/// Gets or sets the arg --set-filename so that the name of the file is embedded in the encrypted gpg blob.
-		/// </summary>
-		public string Filename
-		{
-			get { return _filename; }
-			set { _filename = value; }
-		}
+        /// <summary>
+        /// Gets or sets the arg --set-filename so that the name of the file is embedded in the encrypted gpg blob.
+        /// </summary>
+        public string Filename
+        {
+            get { return _filename; }
+            set { _filename = value; }
+        }
 
-		/// <summary>
-		/// Gets or sets the size of the copy buffer.  This value can be adjusted for performance when
-		/// operating on large files.
-		/// </summary>
-		/// <value>The size of the copy buffer.</value>
-		public long CopyBufferSize
-		{
-			get { return _copyBufferSize; }
-			set { _copyBufferSize = value; }
-		}
+        /// <summary>
+        /// Gets or sets the size of the copy buffer.  This value can be adjusted for performance when
+        /// operating on large files.
+        /// </summary>
+        /// <value>The size of the copy buffer.</value>
+        public long CopyBufferSize
+        {
+            get { return _copyBufferSize; }
+            set { _copyBufferSize = value; }
+        }
 
-		/// <summary>
-		/// Gets or sets a value indicating whether execution errors reported by gpg should be ignored.
-		/// </summary>
-		/// <value><c>true</c> if ignore errors; otherwise, <c>false</c>.</value>
-		public bool IgnoreErrors
-		{
-			get { return _ignoreErrors; }
-			set { _ignoreErrors = value; }
-		}
+        /// <summary>
+        /// Gets or sets a value indicating whether execution errors reported by gpg should be ignored.
+        /// </summary>
+        /// <value><c>true</c> if ignore errors; otherwise, <c>false</c>.</value>
+        public bool IgnoreErrors
+        {
+            get { return _ignoreErrors; }
+            set { _ignoreErrors = value; }
+        }
 
-		/// <summary>
-		/// Sign + encrypt data using the gpg executable with --sign arg.  Input data is provide via a stream.  Output
-		/// data is returned as a stream.  Note that MemoryStream is supported for use.
-		/// </summary>
-		/// <param name="inputStream">Input stream data containing the data to encrypt.</param>
-		/// <param name="outputStream">Output stream which will contain encrypted data.</param>
-		public void SignAndEncrypt(Stream inputStream, Stream outputStream)
-		{
-			if (inputStream == null)
-				throw new ArgumentNullException("Argument inputStream can not be null.");
-			if (outputStream == null)
-				throw new ArgumentNullException("Argument outputStream can not be null.");
-			if (!inputStream.CanRead)
-				throw new ArgumentException("Argument inputStream must be readable.");
-			if (!outputStream.CanWrite)
-				throw new ArgumentException("Argument outputStream must be writable.");
+        /// <summary>
+        /// Sign + encrypt data using the gpg executable with --sign arg.  Input data is provide via a stream.  Output
+        /// data is returned as a stream.  Note that MemoryStream is supported for use.
+        /// </summary>
+        /// <param name="inputStream">Input stream data containing the data to encrypt.</param>
+        /// <param name="outputStream">Output stream which will contain encrypted data.</param>
+        public void SignAndEncrypt(Stream inputStream, Stream outputStream)
+        {
+            if (inputStream == null)
+                throw new ArgumentNullException("Argument inputStream can not be null.");
+            if (outputStream == null)
+                throw new ArgumentNullException("Argument outputStream can not be null.");
+            if (!inputStream.CanRead)
+                throw new ArgumentException("Argument inputStream must be readable.");
+            if (!outputStream.CanWrite)
+                throw new ArgumentException("Argument outputStream must be writable.");
 
-			ExecuteGpg(ActionTypes.SignEncrypt, inputStream, outputStream);
-		}
+            ExecuteGpg(ActionTypes.SignEncrypt, inputStream, outputStream);
+        }
 
-		/// <summary>
-		/// Encrypt data using the gpg executable.  Input data is provide via a stream.  Output
-		/// data is returned as a stream.  Note that MemoryStream is supported for use.
-		/// </summary>
-		/// <param name="inputStream">Input stream data containing the data to encrypt.</param>
-		/// <param name="outputStream">Output stream which will contain encrypted data.</param>
+        /// <summary>
+        /// Encrypt data using the gpg executable.  Input data is provide via a stream.  Output
+        /// data is returned as a stream.  Note that MemoryStream is supported for use.
+        /// </summary>
+        /// <param name="inputStream">Input stream data containing the data to encrypt.</param>
+        /// <param name="outputStream">Output stream which will contain encrypted data.</param>
         /// <remarks>
         /// You must add the recipient's public key to your GnuPG key ring before calling this method.  
-		///  Please see the GnuPG documentation for more information.
+        ///  Please see the GnuPG documentation for more information.
         /// </remarks>
         public void Encrypt(Stream inputStream, Stream outputStream)
         {
@@ -375,11 +373,11 @@ namespace Starksoft.Aspen.GnuPG
         /// </summary>
         /// <param name="inputStream">Input stream containing encrypted data.</param>
         /// <param name="outputStream">Output stream which will contain decrypted data.</param>
-		/// <remarks>
-		/// You must have the appropriate secret key on the GnuPG key ring before calling this method.  
-		/// Please see the GnuPG documentation for more information.
-		/// </remarks>
-		public void Decrypt(Stream inputStream, Stream outputStream)
+        /// <remarks>
+        /// You must have the appropriate secret key on the GnuPG key ring before calling this method.  
+        /// Please see the GnuPG documentation for more information.
+        /// </remarks>
+        public void Decrypt(Stream inputStream, Stream outputStream)
         {
             if (inputStream == null)
                 throw new ArgumentNullException("Argument inputStream can not be null.");
@@ -398,11 +396,11 @@ namespace Starksoft.Aspen.GnuPG
         /// </summary>
         /// <param name="inputStream">Input stream containing data to sign.</param>
         /// <param name="outputStream">Output stream containing signed data.</param>
-		/// <remarks>
-		/// You must have the appropriate secret key on the GnuPG key ring before calling this method.  
-		/// Please see the GnuPG documentation for more information.
-		/// </remarks>
-		public void Sign(Stream inputStream, Stream outputStream)
+        /// <remarks>
+        /// You must have the appropriate secret key on the GnuPG key ring before calling this method.  
+        /// Please see the GnuPG documentation for more information.
+        /// </remarks>
+        public void Sign(Stream inputStream, Stream outputStream)
         {
             if (inputStream == null)
                 throw new ArgumentNullException("Argument inputStream can not be null.");
@@ -426,12 +424,11 @@ namespace Starksoft.Aspen.GnuPG
                 throw new ArgumentNullException("Argument inputStream can not be null.");
             if (!inputStream.CanRead)
                 throw new ArgumentException("Argument inputStream must be readable.");
-			if (inputStream.Position == inputStream.Length)
-				throw new ArgumentException ("Argument inputStream position cannot be set to the end.  Nothing to read.");
+            if (inputStream.Position == inputStream.Length)
+                throw new ArgumentException ("Argument inputStream position cannot be set to the end.  Nothing to read.");
 
             ExecuteGpg(ActionTypes.Verify, inputStream, new MemoryStream());
         }
-
 
         /// <summary>
         /// Retrieves a collection of all secret keys.
@@ -451,58 +448,57 @@ namespace Starksoft.Aspen.GnuPG
             return new GpgKeyCollection(ExecuteGpgNoIO("--list-keys"));
         }
 
+        /// <summary>
+        /// Import public key
+        /// </summary>
+        /// <param name="inputStream">Input stream containing public key.</param>
+        /// <returns>Name of imported key.</returns>
+        public string Import(Stream inputStream)
+        {
+            if (inputStream == null)
+                throw new ArgumentNullException("Argument inputStream can not be null.");
 
-		/// <summary>
-		/// Import public key
-		/// </summary>
-		/// <param name="inputStream">Input stream containing public key.</param>
-		/// <returns>Name of imported key.</returns>
-		public string Import(Stream inputStream)
-		{
-			if (inputStream == null)
-				throw new ArgumentNullException("Argument inputStream can not be null.");
+            if (!inputStream.CanRead)
+                throw new ArgumentException("Argument inputStream must be readable.");
 
-			if (!inputStream.CanRead)
-				throw new ArgumentException("Argument inputStream must be readable.");
+            using (Stream outputStream = new MemoryStream())
+            {
+                ExecuteGpg(ActionTypes.Import, inputStream, outputStream);
+                outputStream.Seek(0, SeekOrigin.Begin);
+                StreamReader sr = new StreamReader(outputStream);
+                string line;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    // output looks like this:
+                    // gpg: key FF5176CC: public key "One Team <user@domain.com>" imported
+                    Match m = Regex.Match(line, @".*key ([A-Z0-9]{8}):");
+                    if (m.Success)
+                    {
+                        return m.Groups[1].Value;
+                    }
+                }
+            }
 
-			using (Stream outputStream = new MemoryStream())
-			{
-				ExecuteGpg(ActionTypes.Import, inputStream, outputStream);
-				outputStream.Seek(0, SeekOrigin.Begin);
-				StreamReader sr = new StreamReader(outputStream);
-				string line;
-				while ((line = sr.ReadLine()) != null)
-				{
-					// output looks like this:
-					// gpg: key FF5176CC: public key "One Team <user@domain.com>" imported
-					Match m = Regex.Match(line, @".*key ([A-Z0-9]{8}):");
-					if (m.Success)
-					{
-						return m.Groups[1].Value;
-					}
-				}
-			}
+            throw new GpgException("Unable to identify name of imported key.  Possible import error or unrecognized text output.");
+        }
 
-			throw new GpgException("Unable to identify name of imported key.  Possible import error or unrecognized text output.");
-		}
-
-		/// <summary>
-		/// Executes the gpg program as a single command without input or output streams.
-		/// This method is used to report data back from gpg such as key list information.
-		/// </summary>
-		/// <returns>The gpg command.</returns>
-		/// <param name="gpgArgs">gpg command arguments to pass to gpg executable</param>
+        /// <summary>
+        /// Executes the gpg program as a single command without input or output streams.
+        /// This method is used to report data back from gpg such as key list information.
+        /// </summary>
+        /// <returns>The gpg command.</returns>
+        /// <param name="gpgArgs">gpg command arguments to pass to gpg executable</param>
         private StreamReader ExecuteGpgNoIO(string gpgArgs)
         {
-			StringBuilder options = new StringBuilder();
-			options.Append(gpgArgs);
+            StringBuilder options = new StringBuilder();
+            options.Append(gpgArgs);
 
-			//  set a home directory if the user specifies one
-			if (!String.IsNullOrEmpty(_homePath))
+            //  set a home directory if the user specifies one
+            if (!String.IsNullOrEmpty(_homePath))
                 options.Append(String.Format(CultureInfo.InvariantCulture, "--homedir \"{0}\" ", _homePath));
 
             //  create a process info object with command line options
-			ProcessStartInfo procInfo = new ProcessStartInfo(GetGpgBinaryPath(), options.ToString());
+            ProcessStartInfo procInfo = new ProcessStartInfo(GetGpgBinaryPath(), options.ToString());
 
             //  init the procInfo object
             procInfo.CreateNoWindow = true;
@@ -511,7 +507,7 @@ namespace Starksoft.Aspen.GnuPG
             procInfo.RedirectStandardOutput = true;
             procInfo.RedirectStandardError = true;
 
-			// create a memory stream to hold the output in memory
+            // create a memory stream to hold the output in memory
             MemoryStream outputStream = new MemoryStream();
 
             try
@@ -525,19 +521,19 @@ namespace Starksoft.Aspen.GnuPG
                 //  if the process exit code is not 0 then read the error text from the gpg.exe process and throw an exception
                 if (_proc.ExitCode != 0)
                     throw new GpgException(_proc.StandardError.ReadToEnd());
-				// grab a copy of the console output
+                // grab a copy of the console output
                 CopyStream(_proc.StandardOutput.BaseStream, outputStream);
             }
             catch (Exception exp)
             {
-				throw new GpgException(String.Format("An error occurred while trying to execute command {0}: {1}.", gpgArgs, exp));
+                throw new GpgException(String.Format("An error occurred while trying to execute command {0}: {1}.", gpgArgs, exp));
             }
             finally
             {
                 Dispose(true);
             }
 
-			// reset the stream position and return as a StreamReader
+            // reset the stream position and return as a StreamReader
             StreamReader reader = new StreamReader(outputStream);
             reader.BaseStream.Position = 0;
             return reader;
@@ -545,143 +541,135 @@ namespace Starksoft.Aspen.GnuPG
 
         private string GetGpgArgs(ActionTypes action)
         {
-			// validate input
-			switch (action) 
-			{
-				case ActionTypes.Encrypt:
-				case ActionTypes.SignEncrypt:
-					if (String.IsNullOrEmpty (_recipient))
-						throw new GpgException ("A Recipient is required before encrypting data.  Please specify a valid recipient using the Recipient property on the GnuPG object.");
-					break;
-			}
+            // validate input
+            switch (action) 
+            {
+                case ActionTypes.Encrypt:
+                case ActionTypes.SignEncrypt:
+                if (String.IsNullOrEmpty (_recipient))
+                    throw new GpgException ("A Recipient is required before encrypting data.  Please specify a valid recipient using the Recipient property on the GnuPG object.");
+                    break;
+            }
 
             StringBuilder options = new StringBuilder();
 
             //  set a home directory if the user specifies one
-			if (!String.IsNullOrEmpty (_homePath))
+            if (!String.IsNullOrEmpty (_homePath))
                 options.Append(String.Format(CultureInfo.InvariantCulture, "--homedir \"{0}\" ", _homePath));
             
-			//  tell gpg to read the passphrase from the standard input so we can automate providing it
+            //  tell gpg to read the passphrase from the standard input so we can automate providing it
             options.Append("--passphrase-fd 0 ");
             
-			//  turn off verbose statements
+            //  turn off verbose statements
             options.Append("--no-verbose ");
             
-			// use batch mode and never ask or allow interactive commands. 
-			options.Append("--batch ");
+            // use batch mode and never ask or allow interactive commands. 
+            options.Append("--batch ");
 
-			//  always use the trusted model so we don't get an interactive session with gpg.exe
+            //  always use the trusted model so we don't get an interactive session with gpg.exe
             options.Append("--trust-model always ");
 
-			// if provided specify the key to use by local user name
-			if (!String.IsNullOrEmpty(_localUser))
-				options.Append(String.Format(CultureInfo.InvariantCulture, "--local-user {0} ", _localUser));
+            // if provided specify the key to use by local user name
+            if (!String.IsNullOrEmpty(_localUser))
+                options.Append(String.Format(CultureInfo.InvariantCulture, "--local-user {0} ", _localUser));
 
-			// if provided specify the recipient key to use by recipient user name
-			if (!String.IsNullOrEmpty(_recipient))
-				options.Append(String.Format(CultureInfo.InvariantCulture, "--recipient {0} ", _recipient));
+            // if provided specify the recipient key to use by recipient user name
+            if (!String.IsNullOrEmpty(_recipient))
+                options.Append(String.Format(CultureInfo.InvariantCulture, "--recipient {0} ", _recipient));
 
             //  handle the action
             switch (action)
             {
-				case ActionTypes.Encrypt:
-					if (_outputType == OutputTypes.AsciiArmor)
-						options.Append ("--armor ");
-				
-					// if a filename needs to be embedded in the encrypted blob, set it
-					if (!String.IsNullOrEmpty(_filename))
-						options.Append(String.Format(CultureInfo.InvariantCulture, "--set-filename \"{0}\" ", _filename));
+                case ActionTypes.Encrypt:
+                    if (_outputType == OutputTypes.AsciiArmor)
+                        options.Append ("--armor ");
 
-					options.Append ("--encrypt ");
+                    // if a filename needs to be embedded in the encrypted blob, set it
+                    if (!String.IsNullOrEmpty(_filename))
+                        options.Append(String.Format(CultureInfo.InvariantCulture, "--set-filename \"{0}\" ", _filename));
+
+                    options.Append ("--encrypt ");
                     break;
                 case ActionTypes.Decrypt:
                     options.Append("--decrypt ");
                     break;
                 case ActionTypes.Sign:
-					switch (_outputSignatureType)
-					{
-						case OutputSignatureTypes.ClearText:
-							options.Append("--clearsign ");
-							break;
-						case OutputSignatureTypes.Detached:
-							options.Append("--detach-sign ");
-							break;
-						case OutputSignatureTypes.Signature:
-							options.Append("--sign ");
-							break;
-					}
-					break;
-				case ActionTypes.SignEncrypt:
-					if (_outputType == OutputTypes.AsciiArmor)
-						options.Append ("--armor ");
-				
-					// if a filename needs to be embedded in the encrypted blob, set it
-					if (!String.IsNullOrEmpty(_filename))
-						options.Append(String.Format(CultureInfo.InvariantCulture, "--set-filename \"{0}\" ", _filename));
+                    switch (_outputSignatureType)
+                    {
+                        case OutputSignatureTypes.ClearText:
+                            options.Append("--clearsign ");
+                            break;
+                        case OutputSignatureTypes.Detached:
+                            options.Append("--detach-sign ");
+                            break;
+                        case OutputSignatureTypes.Signature:
+                            options.Append("--sign ");
+                            break;
+                    }
+                    break;
+                case ActionTypes.SignEncrypt:
+                    if (_outputType == OutputTypes.AsciiArmor)
+                        options.Append ("--armor ");
 
-					// determine which type of signature to generate
-					switch (_outputSignatureType)
-					{
-						case OutputSignatureTypes.ClearText:
-							options.Append("--clearsign ");
-							break;
-						case OutputSignatureTypes.Detached:
-							options.Append("--detach-sign ");
-							break;
-						case OutputSignatureTypes.Signature:
-							options.Append("--sign ");
-							break;
-					}
-					break;
-				case ActionTypes.Verify:
+                    // if a filename needs to be embedded in the encrypted blob, set it
+                    if (!String.IsNullOrEmpty(_filename))
+                        options.Append(String.Format(CultureInfo.InvariantCulture, "--set-filename \"{0}\" ", _filename));
+
+                    // determine which type of signature to generate
+                    switch (_outputSignatureType)
+                    {
+                        case OutputSignatureTypes.ClearText:
+                            options.Append("--clearsign ");
+                            break;
+                        case OutputSignatureTypes.Detached:
+                            options.Append("--detach-sign ");
+                            break;
+                        case OutputSignatureTypes.Signature:
+                            options.Append("--sign ");
+                            break;
+                    }
+                    break;
+                case ActionTypes.Verify:
                     options.Append("--verify ");
                     break;
-				case ActionTypes.Import:
-					options.Append("--import ");
-					break;
-
+                case ActionTypes.Import:
+                    options.Append("--import ");
+                    break;
             }
 
             return options.ToString();
         }
 
-		/// <summary>
-		/// Executes the gpg program with the correct command line args based on the selected crypto action
-		/// and feeds the inputStream data to the program and returns the output data as an outputStream.
-		/// </summary>
-		/// <param name="action">Action to perform (sign, encrypt, etc).</param>
-		/// <param name="inputStream">Input stream.</param>
-		/// <param name="outputStream">Output stream.</param>
-		private void ExecuteGpg(ActionTypes action, Stream inputStream, Stream outputStream)
-		{
+        /// <summary>
+        /// Executes the gpg program with the correct command line args based on the selected crypto action
+        /// and feeds the inputStream data to the program and returns the output data as an outputStream.
+        /// </summary>
+        /// <param name="action">Action to perform (sign, encrypt, etc).</param>
+        /// <param name="inputStream">Input stream.</param>
+        /// <param name="outputStream">Output stream.</param>
+        private void ExecuteGpg(ActionTypes action, Stream inputStream, Stream outputStream)
+        {
             string gpgErrorText = string.Empty;
             string gpgPath = GetGpgBinaryPath();
-			string gpgArgs = GetGpgArgs(action);
+            string gpgArgs = GetGpgArgs(action);
 
             //  create a process info object with command line options
-			ProcessStartInfo procInfo = new ProcessStartInfo(gpgPath, gpgArgs);
-			
+            ProcessStartInfo procInfo = new ProcessStartInfo(gpgPath, gpgArgs);
+            
             //  init the procInfo object
-			procInfo.CreateNoWindow = true; 
-			procInfo.UseShellExecute = false;  
-			procInfo.RedirectStandardInput = true;
-			procInfo.RedirectStandardOutput = true;
-			procInfo.RedirectStandardError = true;
+            procInfo.CreateNoWindow = true; 
+            procInfo.UseShellExecute = false;  
+            procInfo.RedirectStandardInput = true;
+            procInfo.RedirectStandardOutput = true;
+            procInfo.RedirectStandardError = true;
 
             try
             {
                 //  start the gpg process and get back a process start info object
                 _proc = Process.Start(procInfo);
-
-                //  push passphrase onto stdin with an EOL character
-				//byte[] passBytes = ASCIIEncoding.ASCII.GetBytes(_passphrase);
-				//_proc.StandardInput.BaseStream.Write(passBytes, 0, passBytes.Length);
-				//_proc.StandardInput.BaseStream.WriteByte(0x0d);
-				//_proc.StandardInput.BaseStream.WriteByte(0x0a);
-				//_proc.StandardInput.BaseStream.Flush();
                 
-				_proc.StandardInput.WriteLine(_passphrase);
-				_proc.StandardInput.Flush();
+                _proc.StandardInput.WriteLine(_passphrase);
+                _proc.StandardInput.Flush();
 
                 _outputStream = outputStream;
                 _errorStream = new MemoryStream();
@@ -705,7 +693,7 @@ namespace Starksoft.Aspen.GnuPG
                 _proc.StandardInput.Close();
 
                 //  wait for the process to return with an exit code (with a timeout variable)
-				if (!_proc.WaitForExit(_timeout))
+                if (!_proc.WaitForExit(_timeout))
                 {
                     throw new GpgException("A time out event occurred while executing the GPG program.");
                 }
@@ -717,26 +705,25 @@ namespace Starksoft.Aspen.GnuPG
                     errorThread.Abort();
 
                 //  if the process exit code is not 0 then read the error text from the gpg.exe process 
-				if (_proc.ExitCode != 0  && !_ignoreErrors)
+                if (_proc.ExitCode != 0  && !_ignoreErrors)
                 {
                     StreamReader rerror = new StreamReader(_errorStream);
                     _errorStream.Position = 0;
                     gpgErrorText = rerror.ReadToEnd();
                 }        
 
-				// key name is output to error stream so read from the error stream and write out
-				// to the output stream
-				if (action == ActionTypes.Import)
-				{
-					_errorStream.Position = 0;
-					byte[] buffer = new byte[4048];
-					int count;
-					while ((count = _errorStream.Read(buffer, 0, buffer.Length)) != 0)
-					{
-						outputStream.Write(buffer, 0, count);
-					}
-				}
-
+                // key name is output to error stream so read from the error stream and write out
+                // to the output stream
+                if (action == ActionTypes.Import)
+                {
+                    _errorStream.Position = 0;
+                    byte[] buffer = new byte[4048];
+                    int count;
+                    while ((count = _errorStream.Read(buffer, 0, buffer.Length)) != 0)
+                    {
+                        outputStream.Write(buffer, 0, count);
+                    }
+                }
 
             }
             catch (Exception exp)
@@ -759,12 +746,12 @@ namespace Starksoft.Aspen.GnuPG
         private string GetGpgBinaryPath()
         {
             if (String.IsNullOrEmpty(_binaryPath))
-				throw new GpgException("gpg binary path not set");
-			
-			if (!File.Exists(_binaryPath))
+                throw new GpgException("gpg binary path not set");
+                    
+            if (!File.Exists(_binaryPath))
                 throw new GpgException(String.Format("gpg binary path executable invalid or file permissions do not allow access: {0}", _binaryPath));
 
-			return _binaryPath;
+            return _binaryPath;
         }
 
         private void CopyStream(Stream input, Stream output)
@@ -772,7 +759,7 @@ namespace Starksoft.Aspen.GnuPG
             if (_asyncWorker != null && _asyncWorker.CancellationPending)
                 return;                 
 
-			byte[] bytes = new byte[_copyBufferSize];
+            byte[] bytes = new byte[_copyBufferSize];
             int i;
             while ((i = input.Read(bytes, 0, bytes.Length)) != 0)
             {
@@ -787,7 +774,7 @@ namespace Starksoft.Aspen.GnuPG
             Stream input = _proc.StandardOutput.BaseStream;
             Stream output = _outputStream;
 
-			byte[] bytes = new byte[_copyBufferSize];
+            byte[] bytes = new byte[_copyBufferSize];
             int i;
             while ((i = input.Read(bytes, 0, bytes.Length)) != 0)
             {
@@ -800,7 +787,7 @@ namespace Starksoft.Aspen.GnuPG
             Stream input = _proc.StandardError.BaseStream;
             Stream output = _errorStream;
 
-			byte[] bytes = new byte[_copyBufferSize];
+            byte[] bytes = new byte[_copyBufferSize];
             int i;
             while ((i = input.Read(bytes, 0, bytes.Length)) != 0)
             {

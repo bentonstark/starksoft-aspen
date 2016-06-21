@@ -30,8 +30,8 @@ namespace Starksoft.Aspen.GnuPG
     public class GpgKey
     {
         private string _key;
-		private DateTime _keyCreation;
-		private DateTime _keyExpiration;
+        private DateTime _keyCreation;
+	private DateTime _keyExpiration;
         private string _userId;
         private string _userName;
         private string _subKey;
@@ -56,15 +56,15 @@ namespace Starksoft.Aspen.GnuPG
             get { return _key; }
         }
 
-		/// <summary>
-		/// Key creation date and time (if available otherwise DateTime.MinValue).
-		/// </summary>
-		public DateTime KeyCreation
-		{
-			get { return _keyCreation; }
-		}
+        /// <summary>
+        /// Key creation date and time (if available otherwise DateTime.MinValue).
+        /// </summary>
+        public DateTime KeyCreation
+        {
+            get { return _keyCreation; }
+        }
 
-		/// <summary>
+        /// <summary>
         /// Key expiration date and time.
         /// </summary>
         public DateTime KeyExpiration
@@ -112,37 +112,37 @@ namespace Starksoft.Aspen.GnuPG
             get { return _raw; }
         }
 
-		/// <summary>
-		/// Parse the raw console data as provided by gpg output.
-		/// </summary>
+        /// <summary>
+        /// Parse the raw console data as provided by gpg output.
+	/// </summary>
         private void ParseRaw()
         {
-			// split the lines either CR or LF and then remove the empty entries
-			// this will allow the solution to work both Linux and Windows 
-			string[] lines = _raw.Split(  new char[] { '\r', '\n' }, 
-                            StringSplitOptions.RemoveEmptyEntries);
+            // split the lines either CR or LF and then remove the empty entries
+            // this will allow the solution to work both Linux and Windows 
+            string[] lines = _raw.Split(  new char[] { '\r', '\n' }, 
+                                StringSplitOptions.RemoveEmptyEntries);
 
             string[] pub = SplitSpaces(lines[0]);
             string uid = lines[1];
-			string[] sub = null;
-			if (lines.Length < 1)
-				sub = SplitSpaces(lines[2]);
+            string[] sub = null;
+            if (lines.Length < 1)
+                sub = SplitSpaces(lines[2]);
                         
             _key = pub[1];
-			if (pub.Length >= 6) {	
-				if (pub[5].Length > 1)
-					_keyExpiration = DateTime.Parse(pub[5].Substring(0, pub[5].Length-1));
-				_keyCreation = DateTime.Parse(pub[2]);
-			} 
-			else 
-			{
-				_keyExpiration = DateTime.Parse(pub[2]);
-			}
-			// test to see if there is a sub key
-			if (sub != null) {
-				_subKey = sub[1];
-            	_subKeyExpiration = DateTime.Parse(sub[2]);
-			}
+            if (pub.Length >= 6) {	
+                if (pub[5].Length > 1)
+                    _keyExpiration = DateTime.Parse(pub[5].Substring(0, pub[5].Length-1));
+                    _keyCreation = DateTime.Parse(pub[2]);
+                } 
+                else 
+                {
+                    _keyExpiration = DateTime.Parse(pub[2]);
+                }
+                // test to see if there is a sub key
+                if (sub != null) {
+                    _subKey = sub[1];
+                _subKeyExpiration = DateTime.Parse(sub[2]);
+            }
 
             ParseUid(uid);
         }
