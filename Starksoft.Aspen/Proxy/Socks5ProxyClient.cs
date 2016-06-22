@@ -378,7 +378,7 @@ namespace Starksoft.Aspen.Proxy
             if (acceptedAuthMethod == SOCKS5_AUTH_METHOD_USERNAME_PASSWORD && _proxyAuthMethod == SocksAuthentication.None)
             {
                 _tcpClient.Close();
-                throw new ProxyException("The proxy destination requires a username and password for authentication.");
+                throw new ProxyException("The proxy destination requires a username and password for authentication.  If you received this error attempting to connect to the Tor network provide an string empty value for ProxyUserName and ProxyPassword.");
             }
 
             if (acceptedAuthMethod == SOCKS5_AUTH_METHOD_USERNAME_PASSWORD)

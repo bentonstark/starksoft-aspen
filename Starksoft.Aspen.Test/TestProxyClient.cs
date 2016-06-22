@@ -37,6 +37,7 @@ namespace Starksoft.Aspen.Tests
     /// <summary>
     /// Test fixture for Proxy classes.  A proxy server supporting SOCKS and HTTP must be running
     /// on the local host for the unit tests to work.  To run the unit tests you will need Nunit 2.5.10 installed.
+    /// For the Tor specific test you need to have Tor installed and listening on port 9050.
     /// 
     /// For those that are wondering why I am using nunit 2.x.  There are two reasons:  1) never versions are not
     /// supported in monodevelop for Linux.  2) nunit 3.x is far more of a pain to setup and run at the moment.
@@ -56,6 +57,26 @@ namespace Starksoft.Aspen.Tests
     [TestFixture]
     public class TestProxyClient
     {
+        [CLSCompliant(false)]
+        [TestCase("localhost", 9050, "httpbin.org", 80)]
+        public void TestSocks5CreateConnectionTor(string proxyHost, int proxyPort, string destHost, int destPort)
+        {
+
+            Socks5ProxyClient p = new Socks5ProxyClient();
+            p.ProxyHost = proxyHost;
+            p.ProxyPort = proxyPort;
+            p.ProxyUserName = "";
+            p.ProxyPassword = "";
+            TcpClient c = p.CreateConnection(destHost, destPort);
+
+            byte[] sendBuf = System.Text.ASCIIEncoding.ASCII.GetBytes("GET / HTTP/1.1\n");
+            c.GetStream().Write(sendBuf, 0, sendBuf.Length);
+            byte[] recvBuf = new byte[1024];
+            c.GetStream().Read(recvBuf, 0, recvBuf.Length);
+            Console.Out.WriteLine(System.Text.ASCIIEncoding.ASCII.GetString(recvBuf));
+            c.Close();
+        }
+
         [CLSCompliant(false)]
         [TestCase("localhost", 1080, "httpbin.org", 80)]
         public void TestSocks5CreateConnection(string proxyHost, int proxyPort, string destHost, int destPort)
