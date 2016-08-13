@@ -1524,7 +1524,15 @@ namespace Starksoft.Aspen.Ftps
         /// <summary>
         /// Gets or sets the internal character encoding object use to encode the request and response data.
         /// </summary>
-        internal Encoding Encoding
+        /// <remarks>
+        /// The encoding object used for character encoding when communicating with the FTP server
+        /// is managed by the FtpsClient.  If the FTP server your are connecting to has a different encoding
+        /// standard then the client machine, you can override the default behavior with a custom encoding object
+        /// which the FtpsClient will then use instead of the default client Encoding object.  An example would be
+        /// a US english client connecting to a FTP server than contains French UTF-8 encoding characters
+        /// in file names or directories on the FTP server.
+        /// </remarks>
+        public Encoding Encoding
         {
             get { return _encode; }
             set { _encode = value; }

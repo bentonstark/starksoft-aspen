@@ -1,0 +1,33 @@
+﻿<Properties StartupItem="Starksoft.Aspen.Test/Starksoft.Aspen.Test.csproj" GitUserInfo="UsingGIT">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench>
+    <Pads>
+      <Pad Id="MonoDevelop.NUnit.TestPad">
+        <State name="__root__">
+          <Node name="Starksoft.Aspen" expanded="True">
+            <Node name="Starksoft.Aspen.Test" expanded="True">
+              <Node name="Starksoft" expanded="True">
+                <Node name="Aspen" expanded="True">
+                  <Node name="Tests" expanded="True">
+                    <Node name="TestProxyClient" expanded="True">
+                      <Node name="TestSocks5CreateConnection" expanded="True" />
+                      <Node name="TestSocks5CreateConnectionTor" expanded="True">
+                        <Node name="TestSocks5CreateConnectionTor(&quot;localhost&quot;,9050,&quot;httpbin.org&quot;,80)" selected="True" />
+                      </Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="/home/bestark/workspace-mono/starksoft-aspen/Starksoft.Aspen/Ftps/FtpsRequest.cs" line="462" column="1" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
