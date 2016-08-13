@@ -47,11 +47,7 @@ namespace Starksoft.Aspen.Tests
     public class TestGpg
     {
         private const String HOME_PATH = "~/";
-#if WIN
-        private const String GPG_BINARY_PATH = "C:\\Program Files (x86)\\GNU\\GnuPG\\gpg2.exe";
-#else
         private const String GPG_BINARY_PATH = "/usr/bin/gpg2";
-#endif
         private const String GPG_PASSWORD = "password";
         private const String GPG_LOCAL_USER_KEY = "jones@domain.com";
         private const String GPG_RECIPIENT_KEY = "albert@domain.com";

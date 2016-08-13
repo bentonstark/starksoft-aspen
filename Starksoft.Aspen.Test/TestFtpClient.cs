@@ -18,7 +18,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using System.Text;
 using System.IO;
 using NUnit.Framework;
 using Starksoft.Aspen.Ftps;
