@@ -436,7 +436,7 @@ namespace Starksoft.Aspen.GnuPG
         /// <returns>Collection of GnuPGKey objects.</returns>
         public GpgKeyCollection GetSecretKeys()
         {
-            return new GpgKeyCollection(ExecuteGpgNoIO("--list-secret-keys"));
+            return new GpgKeyCollection(ExecuteGpgNoIO("--list-secret-keys "));
         }
 
         /// <summary>
@@ -445,7 +445,7 @@ namespace Starksoft.Aspen.GnuPG
         /// <returns>Collection of GnuPGKey objects.</returns>
         public GpgKeyCollection GetKeys()
         {
-            return new GpgKeyCollection(ExecuteGpgNoIO("--list-keys"));
+            return new GpgKeyCollection(ExecuteGpgNoIO("--list-keys "));
         }
 
         /// <summary>
