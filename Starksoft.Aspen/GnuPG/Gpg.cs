@@ -614,6 +614,8 @@ namespace Starksoft.Aspen.GnuPG
                     // if a filename needs to be embedded in the encrypted blob, set it
                     if (!String.IsNullOrEmpty(_filename))
                         options.Append(String.Format(CultureInfo.InvariantCulture, "--set-filename \"{0}\" ", _filename));
+                        
+                    options.Append("--encrypt ");
 
                     // determine which type of signature to generate
                     switch (_outputSignatureType)
