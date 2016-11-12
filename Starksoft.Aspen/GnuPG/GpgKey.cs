@@ -119,11 +119,16 @@ namespace Starksoft.Aspen.GnuPG
         {
             // split the lines either CR or LF and then remove the empty entries
             // this will allow the solution to work both Linux and Windows 
-            string[] lines = _raw.Split(  new char[] { '\r', '\n' }, 
+            string rawClean = _raw;
+            rawClean = rawClean.Replace("[", "");
+            rawClean = rawClean.Replace("]", "");
+            string[] lines = rawClean.Split(  new char[] { '\r', '\n' }, 
                                 StringSplitOptions.RemoveEmptyEntries);
 
             string[] pub = SplitSpaces(lines[0]);
-            string uid = lines[1];
+            string uid = null;
+            if (lines.Length > 1)
+                uid = lines[1];
             string[] sub = null;
             if (lines.Length < 1)
                 sub = SplitSpaces(lines[2]);
@@ -136,15 +141,18 @@ namespace Starksoft.Aspen.GnuPG
                 } 
                 else 
                 {
-                    _keyExpiration = DateTime.Parse(pub[2]);
+                    // try to parse it
+                    DateTime.TryParse(pub[2], out _keyExpiration);
                 }
                 // test to see if there is a sub key
                 if (sub != null) {
                     _subKey = sub[1];
-                _subKeyExpiration = DateTime.Parse(sub[2]);
+                DateTime.TryParse(sub[2], out _subKeyExpiration);
             }
 
-            ParseUid(uid);
+            // test to see if we have a uid and if so try to parse it
+            if (uid != null)
+                ParseUid(uid);
         }
 
         private string[] SplitSpaces(string input)

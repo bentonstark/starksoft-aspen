@@ -492,6 +492,8 @@ namespace Starksoft.Aspen.GnuPG
         {
             StringBuilder options = new StringBuilder();
             options.Append(gpgArgs);
+            // append a space to allow for additional commands to be added if required
+            options.Append(" ");  
 
             //  set a home directory if the user specifies one
             if (!String.IsNullOrEmpty(_homePath))
