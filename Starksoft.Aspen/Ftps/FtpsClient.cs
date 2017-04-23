@@ -848,7 +848,7 @@ namespace Starksoft.Aspen.Ftps
         /// back is not parsed or processed in any way by the FtpsClient object.  
         /// </remarks>
         public string GetHelp()
-	{
+	    {
             VerifyOpened();           
             try
             {

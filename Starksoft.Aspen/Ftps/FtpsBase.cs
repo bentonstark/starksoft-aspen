@@ -146,6 +146,20 @@ namespace Starksoft.Aspen.Ftps
         /// </summary>
         None,
         /// <summary>
+        /// Specifies Transport Layer Security (TLS) version 1.2 is required to secure communciations in explicit mode.  The TLS 1.2 protocol is defined in IETF RFC 5246 and supercedes the TLS 1.1 protocol.
+        /// </summary>
+        /// <remarks>
+        /// The AUTH TLS command is sent to the FTP server to secure the connection.  
+        /// </remarks>
+        Tls12Explicit,
+        /// <summary>
+        /// Specifies Transport Layer Security (TLS) version 1.1 is required to secure communciations in explicit mode.  The TLS 1.1 protocol is defined in IETF RFC 4346 and supercedes the TLS 1.0 protocol.
+        /// </summary>
+        /// <remarks>
+        /// The AUTH TLS command is sent to the FTP server to secure the connection.  
+        /// </remarks>
+        Tls11Explicit,
+        /// <summary>
         /// Specifies Transport Layer Security (TLS) version 1.0 is required to secure communciations.  The TLS protocol is defined in IETF RFC 2246 and supercedes the SSL 3.0 protocol.
         /// </summary>
         /// <remarks>
@@ -184,6 +198,22 @@ namespace Starksoft.Aspen.Ftps
         /// protocol Ssl3, otherwise specify Tls1.
         /// </remarks>
         Ssl2Explicit,
+        /// <summary>
+        /// Specifies Transport Layer Security (TLS) version 1.2 is required to secure communciations in explicit mode.  The TLS 1.2 protocol is defined in IETF RFC 5246 and supercedes the TLS 1.1 protocol.
+        /// </summary>
+        /// <remarks>
+        /// The AUTH TLS command is sent to the FTP server to secure the connection.  TLS protocol is the latest version of the SSL protcol and is the security protocol that should be used whenever possible.
+        /// There are slight differences between SSL version 3.0 and TLS version 1.0, but the protocol remains substantially the same.
+        /// </remarks>
+        Tls12Implicit,
+        /// <summary>
+        /// Specifies Transport Layer Security (TLS) version 1.1 is required to secure communciations in explicit mode.  The TLS 1.1 protocol is defined in IETF RFC 4346 and supercedes the TLS 1.0 protocol.
+        /// </summary>
+        /// <remarks>
+        /// The AUTH TLS command is sent to the FTP server to secure the connection.  TLS protocol is the latest version of the SSL protcol and is the security protocol that should be used whenever possible.
+        /// There are slight differences between SSL version 3.0 and TLS version 1.0, but the protocol remains substantially the same.
+        /// </remarks>
+        Tls11Implicit,
         /// <summary>
         /// Specifies Transport Layer Security (TLS) version 1.0 is required to secure communciations in explicit mode.  The TLS protocol is defined in IETF RFC 2246 and supercedes the SSL 3.0 protocol.
         /// </summary>
@@ -1659,13 +1689,17 @@ namespace Starksoft.Aspen.Ftps
             if (_securityProtocol == FtpsSecurityProtocol.Ssl2Explicit 
                 || _securityProtocol == FtpsSecurityProtocol.Ssl3Explicit 
                 || _securityProtocol == FtpsSecurityProtocol.Tls1Explicit 
-                || _securityProtocol == FtpsSecurityProtocol.Tls1OrSsl3Explicit)
+                || _securityProtocol == FtpsSecurityProtocol.Tls1OrSsl3Explicit
+                || _securityProtocol == FtpsSecurityProtocol.Tls11Explicit
+                || _securityProtocol == FtpsSecurityProtocol.Tls12Explicit)
                 CreateSslExplicitCommandStream();
 
             if (_securityProtocol == FtpsSecurityProtocol.Ssl2Implicit 
                 || _securityProtocol == FtpsSecurityProtocol.Ssl3Implicit 
                 || _securityProtocol == FtpsSecurityProtocol.Tls1Implicit 
-                || _securityProtocol == FtpsSecurityProtocol.Tls1OrSsl3Implicit)
+                || _securityProtocol == FtpsSecurityProtocol.Tls1OrSsl3Implicit
+                || _securityProtocol == FtpsSecurityProtocol.Tls11Implicit
+                || _securityProtocol == FtpsSecurityProtocol.Tls12Implicit)
                 CreateSslImplicitCommandStream();
 
             // test to see if this is an asychronous operation and if so make sure 
@@ -2486,7 +2520,17 @@ namespace Starksoft.Aspen.Ftps
             switch (_networkProtocol)
             {
                 case NetworkVersion.IPv4:
-                    SendPasvCmd(out host, out port);
+                    // some FileZilla servers appear to allow EPSV but not PASV even on IPv4 so we test
+                    // for EPSV support and if available use it; otherwise use PASV
+                    if (Features.Count > 0 && Features.Contains(FtpsCmd.Epsv) && !Features.Contains(FtpsCmd.Pasv))
+                    {
+                        SendEpsvCmd(out host, out port); 
+                    }
+                    else
+                    {
+                        SendPasvCmd(out host, out port);
+                    }
+
                     break;
                 case NetworkVersion.IPv6:
                     SendEpsvCmd(out host, out port);
@@ -2633,6 +2677,14 @@ namespace Starksoft.Aspen.Ftps
                 case FtpsSecurityProtocol.Tls1Implicit:
                     protocol = SslProtocols.Tls;
                     break;
+                case FtpsSecurityProtocol.Tls11Explicit:
+                case FtpsSecurityProtocol.Tls11Implicit:
+                    protocol = SslProtocols.Tls11;
+                    break;
+                case FtpsSecurityProtocol.Tls12Explicit:
+                case FtpsSecurityProtocol.Tls12Implicit:
+                    protocol = SslProtocols.Tls12;
+                    break;
                 default:
                     throw new FtpsSecureConnectionException(String.Format("unexpected FtpSecurityProtocol type '{0}'", _securityProtocol.ToString()));
             }
@@ -2706,6 +2758,8 @@ namespace Starksoft.Aspen.Ftps
                         authCommand = "SSL";
                         break;
                     case FtpsSecurityProtocol.Tls1Explicit:
+                    case FtpsSecurityProtocol.Tls11Explicit:
+                    case FtpsSecurityProtocol.Tls12Explicit:
                         authCommand = "TLS";
                         break;
                 }

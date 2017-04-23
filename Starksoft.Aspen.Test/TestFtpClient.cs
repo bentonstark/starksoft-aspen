@@ -62,7 +62,7 @@ namespace Starksoft.Aspen.Tests
         [Test]
         public void TestUserReportedError1()
         {
-            FtpsClient ftp = new FtpsClient(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.Tls1Explicit);
+            FtpsClient ftp = new FtpsClient(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.Tls12Explicit);
             ftp.NetworkProtocol = NETWORK_PROTOCOL;
             ftp.AlwaysAcceptServerCertificate = true;
             ftp.Open(FTP_USER, FTP_PASS);
@@ -76,7 +76,44 @@ namespace Starksoft.Aspen.Tests
         [Test]
         public void TestUserReportedError2()
         {
-            FtpsClient ftp = new FtpsClient(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.Tls1Explicit);
+            // clean up anything that may have been left over from previous tests
+            FtpsClient ftp1 = new FtpsClient(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.None);
+            ftp1.NetworkProtocol = NETWORK_PROTOCOL;
+            ftp1.Open(FTP_USER, FTP_PASS);
+
+            try
+            {
+                ftp1.ChangeDirectory("test dir");
+            }
+            catch
+            {
+            }
+            try
+            {
+                ftp1.DeleteFile("testfile.txt");
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                ftp1.ChangeDirectory("\\");
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                ftp1.DeleteDirectory("test dir");
+            }
+            catch
+            {
+            }
+
+
+            FtpsClient ftp = new FtpsClient(FTP_HOST, FTP_STD_PORT, FtpsSecurityProtocol.Tls12Explicit);
             ftp.NetworkProtocol = NETWORK_PROTOCOL;
             ftp.AlwaysAcceptServerCertificate = true;
             ftp.Open(FTP_USER, FTP_PASS);
@@ -84,12 +121,10 @@ namespace Starksoft.Aspen.Tests
             ftp.ChangeDirectory("test dir");
             ftp.PutFile(GetMemoryStreamRandom(100), "testfile.txt", FileAction.Create);
             FtpsItemCollection col = ftp.GetDirList();
-            ftp.DeleteFile("testfile.txt");
-            ftp.ChangeDirectory("\\");
-            ftp.DeleteDirectory("test dir");
             ftp.Close();
 
             Assert.IsTrue(col.Count == 1);
+
         }
 
         /// <summary>
