@@ -150,8 +150,8 @@ namespace Starksoft.Aspen.Ftps
         private string _characterSet;   // charset=
 
         // UNIX specific MLSx object facts
-        private Int32? _group;      // UNIX.group=
-        private Int32? _owner;      // UNIX.owner=
+        private string _group;      // UNIX.group=
+        private string _owner;      // UNIX.owner=
 
         /// <summary>
         /// Default constructor.
@@ -191,8 +191,8 @@ namespace Starksoft.Aspen.Ftps
                        string language,
                        string mediaType,
                        string characterSet,
-                       Int32? group,
-                       Int32? owner
+                       string group,
+                       string owner
                      ) : base(name, modified, size, itemType, attributes, mode, String.Empty, rawText)
         {
             _created = created;
@@ -268,7 +268,7 @@ namespace Starksoft.Aspen.Ftps
         /// UNIX.* facts.  This value is a nullable field and will be null if no
         /// fact name was found.
         /// </remarks>
-        public Int32? Group
+        public string Group
         {
             get { return _group; }
         }
@@ -282,7 +282,7 @@ namespace Starksoft.Aspen.Ftps
         /// UNIX.* facts.  This value is a nullable field and will be null if no
         /// fact name was found.
         /// </remarks>
-        public Int32? Owner
+        public string Owner
         {
             get { return _owner; }
         }

@@ -337,7 +337,7 @@ namespace Starksoft.Aspen.Proxy
                 //HOST starksoft.com:443<CR><LF>
                 //[... other HTTP header lines ending with <CR><LF> if required]>
                 //<CR><LF>    // Last Empty Line
-                connectCmd = String.Format(CultureInfo.InvariantCulture, HTTP_PROXY_CONNECT_CMD + "\r\n", host, port.ToString(CultureInfo.InvariantCulture));
+                connectCmd = String.Format(CultureInfo.InvariantCulture, HTTP_PROXY_CONNECT_CMD, host, port.ToString(CultureInfo.InvariantCulture));
             }
             return connectCmd;
         }

@@ -18,6 +18,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Globalization;
 using System.Text;
@@ -46,9 +47,9 @@ namespace Starksoft.Aspen.Ftps
         private string _charSet;    // charset=
 
         // UNIX specific MLSx object facts
-        private Int32? _unixGroup;  // UNIX.group=
+        private string _unixGroup;  // UNIX.group=
         private Int32? _unixMode;   // UNIX.mode=
-        private Int32? _unixOwner;  // UNIX.owner=
+        private string _unixOwner;  // UNIX.owner=
 
         private string _attributes;
 
@@ -85,6 +86,8 @@ namespace Starksoft.Aspen.Ftps
         private const char PERM_CAN_DELETE_DIRECTORY = 'p';
         private const char PERM_CAN_RETRIEVE_FILE = 'r';
         private const char PERM_CAN_STORE_FILE = 'w';
+        // Unix permission not set indicator
+        private const char PERM_NOT_SET = '-';
 
         // MLSx date/time field size
         private const int DATE_TIME_MIN_LEN = 14;
@@ -97,6 +100,8 @@ namespace Starksoft.Aspen.Ftps
         /// <returns>Object representing data in parsed file listing line.</returns>
         public FtpsItem ParseLine(string line)
         {
+            Trace.WriteLine("ftps: '" + line + "'");
+
             if (String.IsNullOrEmpty(line))
                 throw new FtpsItemParsingException("line cannot be empty");
             Parse(line);
@@ -125,19 +130,33 @@ namespace Starksoft.Aspen.Ftps
             // ex: Type=file;Size=1830;Modify=19940916055648;Perm=r; hatch.c
             // ex: modify=20120822211414;perm=adfr;size=2101;type=file;unique=16UF3F5;UNIX.group=49440;UNIX.mode=0744;UNIX.owner=49440; iphone_settings_icon.jpg
             // ex: modify=20030225143801;perm=adfr;size=503;type=file;unique=12U24470006;UNIX.group=0;UNIX.mode=0644;UNIX.owner=0; welcome.msg
-            string[] fields = line.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 
-            if (fields.Length == 0)
+            string filename;
+
+            int spaceIndex = line.IndexOf( " ", StringComparison.InvariantCulture );
+
+            if( spaceIndex == -1 ) {
                 return;
+            }
 
-            // parse fact fields
-            for (int i = 0; i < fields.Length - 1; i++)
-            {
-                ParseField(fields[i]);
+            filename = line.Substring( spaceIndex );
+            if( filename.Length == 1 ) {
+                return;
+            }
+
+            if( spaceIndex != 0 ) {
+                string facts = line.Substring( 0, spaceIndex - 1 );
+
+                string[] fields = facts.Split( new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries );
+
+                // parse fact fields
+                for( int i = 0; i < fields.Length - 1; i++ ) {
+                    ParseField( fields[ i ] );
+                }
             }
 
             // last field is always name of the object
-            ParseName(fields[fields.Length - 1]);
+            ParseName(filename);
 
             if (_name == ".")
                 _itemType = FtpItemType.CurrentDirectory;
@@ -166,7 +185,7 @@ namespace Starksoft.Aspen.Ftps
                 throw new FtpsItemParsingException("field cannot be a null or empty value");
 
             if (field.IndexOf('=') == -1)
-                throw new FtpsItemParsingException("field must contain equals '=' value");
+                throw new FtpsItemParsingException("field must contain equals '=' value" );
 
             // split the field fact
             string[] fact = field.Split('=');
@@ -210,7 +229,7 @@ namespace Starksoft.Aspen.Ftps
                     _unique = value;
                     break;
                 case FACT_EXT_UNIX_GROUP:
-                    _unixGroup = ParseInt32(value);
+                    _unixGroup = value;
                     break;
                 case FACT_EXT_UNIX_MODE:
                     _unixMode = ParseInt32(value);
@@ -218,7 +237,7 @@ namespace Starksoft.Aspen.Ftps
                         _attributes = FtpsUtilities.ModeToAttribute(_unixMode.Value);
                     break;
                 case FACT_EXT_UNIX_OWNER:
-                    _unixOwner = ParseInt32(value);
+                    _unixOwner = value;
                     break;
                 default:
                     break;
@@ -290,7 +309,17 @@ namespace Starksoft.Aspen.Ftps
             if (String.IsNullOrEmpty(v))
                 return MlsxPerm.None;
 
-            char[] pary = v.ToLower().ToCharArray();
+            char[] pary;
+
+            v = v.ToLower();
+
+            // Wing FTP Server returns POSIX-style permissions. So just pull out the user read and write permissions and parse those.
+            if( v.Length == 10 && ( v.Contains( "-" ) || v == "drwxrwxrwx" ) ) {
+                pary = new[] { v[ 1 ], v[ 2 ] };
+            }
+            else {
+                pary = v.ToCharArray();
+            }
 
             MlsxPerm pem = MlsxPerm.None;
 
@@ -327,6 +356,8 @@ namespace Starksoft.Aspen.Ftps
                         break;
                     case PERM_CAN_STORE_FILE:
                         pem = pem | MlsxPerm.CanStoreFile;
+                        break;
+                    case PERM_NOT_SET:
                         break;
                     default:
                         throw new FtpsItemParsingException(String.Format("unknown MLSx 'perm' value '{0}' encountered", pchar));
