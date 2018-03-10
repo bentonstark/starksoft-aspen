@@ -29,6 +29,11 @@ namespace Starksoft.Aspen.Tests
 {
     /// <summary>
     /// Test fixture for Starksoft.Net.FtpsClient.
+    /// 
+    /// To run the unit tests you will need Nunit.Framework 3.9+ installed.  To execute unit tests from visual
+    /// studio you will also need NUnit 3 Test Adapater and Microsoft.NET.Test.SDK installed.  All can be installed
+    /// via the Nuget manager and then associated with the project.
+    /// 
     /// </summary>
     [TestFixture]
 

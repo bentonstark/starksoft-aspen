@@ -62,3 +62,11 @@ bld/
 Network Trash Folder
 Temporary Items
 .apdisk
+/packages
+/.vs/Starksoft.Aspen/v15/Server/sqlite3
+
+# Nuget binary files 
+*.nugpkg
+Starksoft.Aspen/starksoft.aspen.1.1.4.nupkg
+
+

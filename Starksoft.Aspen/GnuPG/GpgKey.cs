@@ -136,7 +136,7 @@ namespace Starksoft.Aspen.GnuPG
             _key = pub[1];
             if (pub.Length >= 6) {	
                 if (pub[5].Length > 1)
-                    _keyExpiration = DateTime.Parse(pub[5].Substring(0, pub[5].Length-1));
+                    _keyExpiration = DateTime.Parse(pub[5].Substring(0, pub[5].Length));
                     _keyCreation = DateTime.Parse(pub[2]);
                 } 
                 else 

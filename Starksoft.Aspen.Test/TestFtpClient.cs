@@ -30,7 +30,7 @@ namespace Starksoft.Aspen.Tests
     /// <remarks>
     /// 
     /// This is the test class for the FtpsClient.  Testing assumes a FileZilla local FTP server running either under
-    /// Windows or Linux/Wine.  The unit tests have been tested under both Windows 10 via .NET and Fedora 22 via Mono.
+    /// Windows or Linux/Wine.  The unit tests have been tested under Windows 10 in Visual Studio 2017.
     /// The FileZilla server must have an account created with user "test" and password "test".  In addition the 
     /// server must be configured to listen on port 2121 for FTP and explicit FTPS connections and port 9990 for
     /// implicit FTPS connections.  The server certificate can be self signed.  The home directory for user test
@@ -39,11 +39,9 @@ namespace Starksoft.Aspen.Tests
     /// The tests can be run with IPv6 or IPv4 based on the FTP_HOST and NETWORK_PROTOCOL const settings.  Other
     /// defaults such as FTP user name, password and ports can be set by changing the constants.
     /// 
-    /// To run the unit tests you will need Nunit 2.5.10 installed.
-    /// For those that are wondering why I am using nunit 2.x.  There are two reasons:  1) never versions are not
-    /// supported in monodevelop for Linux.  2) nunit 3.x is far more of a pain to setup and run at the moment.
-    /// This project is being maintained and tested under two environments so I need a unit test version that works
-    /// for both.
+    /// To run the unit tests you will need Nunit.Framework 3.9+ installed.  To execute unit tests from visual
+    /// studio you will also need NUnit 3 Test Adapater and Microsoft.NET.Test.SDK installed.  All can be installed
+    /// via the Nuget manager and then associated with the project.
     /// 
     /// </remarks>
     [TestFixture]

@@ -470,8 +470,9 @@ namespace Starksoft.Aspen.GnuPG
                 while ((line = sr.ReadLine()) != null)
                 {
                     // output looks like this:
+                    // gpg: key 13F1C2BB58E7940B: public key \"Joe Test <joe@domain.com>\" imported
                     // gpg: key FF5176CC: public key "One Team <user@domain.com>" imported
-                    Match m = Regex.Match(line, @".*key ([A-Z0-9]{8}):");
+                    Match m = Regex.Match(line, @"imported|not changed");
                     if (m.Success)
                     {
                         return m.Groups[1].Value;

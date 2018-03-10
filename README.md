@@ -2,6 +2,7 @@
 security and cryptography library that includes a FTPS client, GnuPG wrapper, Windows smart card API, and proxy clients
 
 Written in c# under LGPL3 and testing under .NET 4.0/4.5 and Mono 4.0/4.5.  Compiles with .NET/Mono 2.0+
+or Visual Studio 2017 on Windows 10.
 
 official repository
 

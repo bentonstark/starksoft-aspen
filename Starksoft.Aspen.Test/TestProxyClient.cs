@@ -36,14 +36,12 @@ namespace Starksoft.Aspen.Tests
 {
     /// <summary>
     /// Test fixture for Proxy classes.  A proxy server supporting SOCKS and HTTP must be running
-    /// on the local host for the unit tests to work.  To run the unit tests you will need Nunit 2.5.10 installed.
+    /// on the local host for the unit tests to work.  
     /// For the Tor specific test you need to have Tor installed and listening on port 9050.
     /// 
-    /// For those that are wondering why I am using nunit 2.x.  There are two reasons:  1) never versions are not
-    /// supported in monodevelop for Linux.  2) nunit 3.x is far more of a pain to setup and run at the moment.
-    /// This project is being maintained and tested under two environments so I need a unit test version that works
-    /// for both.
-    /// 
+    /// To run the unit tests you will need Nunit.Framework 3.9+ installed.  To execute unit tests from visual
+    /// studio you will also need NUnit 3 Test Adapater and Microsoft.NET.Test.SDK installed.  All can be installed
+    /// via the Nuget manager and then associated with the project.
     /// 
     /// proxy           listen
     /// protocol        port
@@ -52,6 +50,7 @@ namespace Starksoft.Aspen.Tests
     /// SOCKSv4a        1080
     /// SOCKSv5         1080
     /// HTTP            8080
+    /// 
     /// 
     /// </summary>
     [TestFixture]
