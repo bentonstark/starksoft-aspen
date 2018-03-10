@@ -161,8 +161,8 @@ namespace Starksoft.Aspen.Ftps
                     row[COL_MLSX_LANGUAGE] = mitem.Language == null ? String.Empty : mitem.Language;
                     row[COL_MLSX_MEDIA_TYPE] = mitem.MediaType == null ? String.Empty : mitem.MediaType;
                     row[COL_MLSX_CHARACTER_SET] = mitem.CharacterSet == null ? String.Empty : mitem.CharacterSet;
-                    row[COL_MLSX_GROUP] = mitem.Group == null ? 0 : mitem.Group;
-                    row[COL_MLSX_OWNER] = mitem.Owner == null ? 0 : mitem.Owner;
+                    row[COL_MLSX_GROUP] = mitem.Group == null ? "" : mitem.Group;
+                    row[COL_MLSX_OWNER] = mitem.Owner == null ? "" : mitem.Owner;
                 }
 
                 dataTbl.Rows.Add(row);
@@ -193,8 +193,8 @@ namespace Starksoft.Aspen.Ftps
             dataTbl.Columns.Add(new DataColumn(COL_MLSX_LANGUAGE, typeof(String)));
             dataTbl.Columns.Add(new DataColumn(COL_MLSX_MEDIA_TYPE, typeof(String)));
             dataTbl.Columns.Add(new DataColumn(COL_MLSX_CHARACTER_SET, typeof(String)));
-            dataTbl.Columns.Add(new DataColumn(COL_MLSX_GROUP, typeof(Int32)));
-            dataTbl.Columns.Add(new DataColumn(COL_MLSX_OWNER, typeof(Int32)));
+            dataTbl.Columns.Add(new DataColumn(COL_MLSX_GROUP, typeof(String)));
+            dataTbl.Columns.Add(new DataColumn(COL_MLSX_OWNER, typeof(String)));
         }
 
         /// <summary>
