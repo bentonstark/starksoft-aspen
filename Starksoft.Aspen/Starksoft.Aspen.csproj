@@ -182,12 +182,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="COPYING.LESSER" />
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="Properties\Starksoft.Aspen.snk" />
+    <None Include="Starksoft.Aspen.nuspec" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

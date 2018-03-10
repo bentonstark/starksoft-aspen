@@ -1,1 +1,1 @@
-nuget pack Starksoft.Aspen.csproj -properties Configuration=Release
+nuget pack Starksoft.Aspen.nuspec -properties Configuration=Release

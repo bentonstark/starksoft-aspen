@@ -66,7 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Starksoft.Aspen\Starksoft.Aspen.csproj">
-      <Project>{5F228FCD-54F1-491D-93CE-3D768655FADC}</Project>
+      <Project>{5f228fcd-54f1-491d-93ce-3d768655fadc}</Project>
       <Name>Starksoft.Aspen</Name>
     </ProjectReference>
   </ItemGroup>
