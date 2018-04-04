@@ -583,6 +583,9 @@ namespace Starksoft.Aspen.GnuPG
             if (!String.IsNullOrEmpty (_homePath))
                 options.Append(String.Format(CultureInfo.InvariantCulture, "--homedir \"{0}\" ", _homePath));
             
+            // this will prevent prompting for passphrase in newer version of Gpg
+            options.Append("--pinentry-mode loopback ");
+            
             //  tell gpg to read the passphrase from the standard input so we can automate providing it
             options.Append("--passphrase-fd 0 ");
 
