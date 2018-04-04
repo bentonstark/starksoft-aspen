@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>starksoft.aspen</id>
-    <version>1.1.5</version>
+    <version>1.1.6</version>
     <authors>Benton Stark</authors>
     <owners>Benton Stark</owners>
     <licenseUrl>https://github.com/bentonstark/starksoft-aspen/blob/master/Starksoft.Aspen/COPYING.LESSER</licenseUrl>
