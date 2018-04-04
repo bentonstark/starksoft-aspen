@@ -44,11 +44,11 @@ namespace Starksoft.Aspen.Ftps
         Regex _unixType = new Regex(@"(d|l|-|b|c|p|s)(?=(r|w|x|-|t|s){9})", RegexOptions.Compiled);
 
         // dos and other expressions
-        Regex _dosName = new System.Text.RegularExpressions.Regex(@"((?<=<DIR>\s+).+)|((?<=\d\d:\d\d\s+).+)|((?<=(\d\d:\d\d(AM|PM|am|pm)\s+\d+\s+)).+)", RegexOptions.Compiled);
-        Regex _dosDate = new System.Text.RegularExpressions.Regex(@"(\d\d-\d\d-\d\d)", RegexOptions.Compiled);
-        Regex _dosTime = new System.Text.RegularExpressions.Regex(@"(\d\d:\d\d\s*(AM|PM|am|pm))|(\d\d:\d\d)", RegexOptions.Compiled);
-        Regex _dosSize = new System.Text.RegularExpressions.Regex(@"((?<=(\d\d:\d\d\s*(AM|PM|am|pm)\s*))\d+)|(\d+(?=\s+\d\d-\d\d-\d\d\s+))", RegexOptions.Compiled);
-        Regex _dosDir = new System.Text.RegularExpressions.Regex(@"<DIR>|\sDIR\s", RegexOptions.Compiled);
+        Regex _dosName = new Regex(@"((?<=<DIR>\s+).+)|((?<=\d\d:\d\d\s+).+)|((?<=(\d\d:\d\d(AM|PM|am|pm)\s+\d+\s+)).+)", RegexOptions.Compiled);
+        Regex _dosDate = new Regex(@"(\d\d-\d\d-\d\d)", RegexOptions.Compiled);
+        Regex _dosTime = new Regex(@"(\d\d:\d\d\s*(AM|PM|am|pm))|(\d\d:\d\d)", RegexOptions.Compiled);
+        Regex _dosSize = new Regex(@"((?<=(\d\d:\d\d\s*(AM|PM|am|pm)\s*))\d+)|(\d+(?=\s+\d\d-\d\d-\d\d\s+))", RegexOptions.Compiled);
+        Regex _dosDir = new Regex(@"<DIR>|\sDIR\s", RegexOptions.Compiled);
 
 
         /// <summary>

@@ -89,6 +89,8 @@
     <Compile Include="ArrayBuilder.cs" />
     <Compile Include="ArrayUtils.cs" />
     <Compile Include="Crc16.cs" />
+    <Compile Include="GnuPG\GpgVersion.cs" />
+    <Compile Include="GnuPG\GpgVersionParser.cs" />
     <Compile Include="Lrc.cs" />
     <Compile Include="Ftps\EventArgs\ConnectionClosedEventArgs.cs" />
     <Compile Include="Ftps\Exceptions\FtpsAsynchronousOperationException.cs" />

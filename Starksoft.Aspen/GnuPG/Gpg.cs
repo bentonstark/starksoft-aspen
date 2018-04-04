@@ -147,6 +147,7 @@ namespace Starksoft.Aspen.GnuPG
         private string _filename;
         private long _copyBufferSize = DEFAULT_COPY_BUFFER_SIZE;
         private bool _ignoreErrors;
+        private string _userOptions;
 
         private Stream _outputStream;
         private Stream _errorStream;
@@ -325,6 +326,17 @@ namespace Starksoft.Aspen.GnuPG
         }
 
         /// <summary>
+        /// Gets or sets user specified option GPG CLI argument string for any additional GPG options 
+        /// that need to be specified by the user.
+        /// </summary>
+        /// <value>String containing GPGP user command line options.</value>
+        public string UserOptions
+        {
+            get { return _userOptions; }
+            set { _userOptions = value; }
+        }
+
+        /// <summary>
         /// Sign + encrypt data using the gpg executable with --sign arg.  Input data is provide via a stream.  Output
         /// data is returned as a stream.  Note that MemoryStream is supported for use.
         /// </summary>
@@ -484,6 +496,17 @@ namespace Starksoft.Aspen.GnuPG
         }
 
         /// <summary>
+        /// Gets the GPG binary version number as reported by the executable.
+        /// </summary>
+        /// <returns>GPG version number in the string format x.y.z</returns>
+        public GpgVersion GetGpgVersion()
+        {
+            GpgVersion ver = GpgVersionParser.Parse(ExecuteGpgNoIO("--version"));
+            return ver;
+        }
+
+
+        /// <summary>
         /// Executes the gpg program as a single command without input or output streams.
         /// This method is used to report data back from gpg such as key list information.
         /// </summary>
@@ -562,7 +585,14 @@ namespace Starksoft.Aspen.GnuPG
             
             //  tell gpg to read the passphrase from the standard input so we can automate providing it
             options.Append("--passphrase-fd 0 ");
-            
+
+            // if gpg cli version is >= 2.1 then instruct gpg not to prompt for a password
+            GpgVersion ver = GetGpgVersion();
+            if (ver.Major >= 2 && ver.Minor >= 1)
+            {
+                options.Append("--pinentry-mode loopback ");
+            }
+
             //  turn off verbose statements
             options.Append("--no-verbose ");
             
@@ -579,6 +609,10 @@ namespace Starksoft.Aspen.GnuPG
             // if provided specify the recipient key to use by recipient user name
             if (!String.IsNullOrEmpty(_recipient))
                 options.Append(String.Format(CultureInfo.InvariantCulture, "--recipient {0} ", _recipient));
+
+            // add any user specific options if provided
+            if (!String.IsNullOrEmpty(_userOptions))
+                options.Append(_userOptions);
 
             //  handle the action
             switch (action)
