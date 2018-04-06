@@ -587,8 +587,9 @@ namespace Starksoft.Aspen.GnuPG
             options.Append("--passphrase-fd 0 ");
 
             // if gpg cli version is >= 2.1 then instruct gpg not to prompt for a password
+            // by specifying the pinetnry-mode argument
             GpgVersion ver = GetGpgVersion();
-            if (ver.Major >= 2 && ver.Minor >= 1)
+            if ((ver.Major == 2 && ver.Minor >= 1) || ver.Major >= 3)
             {
                 options.Append("--pinentry-mode loopback ");
             }
