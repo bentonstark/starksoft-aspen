@@ -666,6 +666,8 @@ namespace Starksoft.Aspen.GnuPG
                             options.Append("--sign ");
                             break;
                     }
+
+                    options.Append("--encrypt ");
                     break;
                 case ActionTypes.Verify:
                     options.Append("--verify ");
