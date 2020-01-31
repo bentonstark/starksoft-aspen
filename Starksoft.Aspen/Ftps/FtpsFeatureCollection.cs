@@ -311,6 +311,7 @@ namespace Starksoft.Aspen.Ftps
                 fl = lines[i];
                 if (fl.Length < 2)
                     throw new FtpsFeatureException("not a properly formatted feature line");
+                fl = fl.Replace(preamble, " ");
                 if (fl.Substring(0, 1) != " ")
                     break;
                 string[] v = SplitFeature(fl);
