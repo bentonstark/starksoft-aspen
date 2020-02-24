@@ -1,21 +1,23 @@
-﻿/*
-* Copyright (c) 2015 Benton Stark
-* This file is part of the Starksoft Aspen library.
-*
-* Starksoft Aspen is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-* 
-* Starksoft Aspen is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
-* along with Starksoft Aspen.  If not, see <http://www.gnu.org/licenses/>.
-*   
-*/
+﻿//
+//  Author:
+//       Benton Stark <benton.stark@gmail.com>
+//
+//  Copyright (c) 2016 Benton Stark
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
 
 // disable visual studio comment on public function warnings
 // for unit tests
@@ -35,6 +37,11 @@ namespace Starksoft.Aspen.Tests
     /// <summary>
     /// Test fixture for Proxy classes.  A proxy server supporting SOCKS and HTTP must be running
     /// on the local host for the unit tests to work.  
+    /// For the Tor specific test you need to have Tor installed and listening on port 9050.
+    /// 
+    /// To run the unit tests you will need Nunit.Framework 3.9+ installed.  To execute unit tests from visual
+    /// studio you will also need NUnit 3 Test Adapater and Microsoft.NET.Test.SDK installed.  All can be installed
+    /// via the Nuget manager and then associated with the project.
     /// 
     /// proxy           listen
     /// protocol        port
@@ -44,10 +51,32 @@ namespace Starksoft.Aspen.Tests
     /// SOCKSv5         1080
     /// HTTP            8080
     /// 
+    /// 
     /// </summary>
     [TestFixture]
     public class TestProxyClient
     {
+        [CLSCompliant(false)]
+        [TestCase("localhost", 9050, "httpbin.org", 80)]
+        public void TestSocks5CreateConnectionTor(string proxyHost, int proxyPort, string destHost, int destPort)
+        {
+
+            Socks5ProxyClient p = new Socks5ProxyClient();
+            p.ProxyHost = proxyHost;
+            p.ProxyPort = proxyPort;
+            p.ProxyUserName = "";
+            p.ProxyPassword = "";
+            TcpClient c = p.CreateConnection(destHost, destPort);
+
+            byte[] sendBuf = System.Text.ASCIIEncoding.ASCII.GetBytes("GET / HTTP/1.1\n");
+            c.GetStream().Write(sendBuf, 0, sendBuf.Length);
+            byte[] recvBuf = new byte[1024];
+            c.GetStream().Read(recvBuf, 0, recvBuf.Length);
+            Console.Out.WriteLine(System.Text.ASCIIEncoding.ASCII.GetString(recvBuf));
+            c.Close();
+        }
+
+        [CLSCompliant(false)]
         [TestCase("localhost", 1080, "httpbin.org", 80)]
         public void TestSocks5CreateConnection(string proxyHost, int proxyPort, string destHost, int destPort)
         {
@@ -65,6 +94,7 @@ namespace Starksoft.Aspen.Tests
             c.Close();
         }
 
+        [CLSCompliant(false)]
         [TestCase("localhost", 8080, "httpbin.org", 80)]
         public void TestHttpCreateConnection(string proxyHost, int proxyPort, string destHost, int destPort)
         {
@@ -82,6 +112,7 @@ namespace Starksoft.Aspen.Tests
             c.Close();
         }
 
+        [CLSCompliant(false)]
         [TestCase("localhost", 1080, "httpbin.org", 80)]
         public void TestSocks4CreateConnection(string proxyHost, int proxyPort, string destHost, int destPort)
         {
@@ -99,6 +130,7 @@ namespace Starksoft.Aspen.Tests
             c.Close();
         }
 
+        [CLSCompliant(false)]
         [TestCase("localhost", 1080, "httpbin.org", 80)]
         public void TestSocks4aCreateConnection(string proxyHost, int proxyPort, string destHost, int destPort)
         {

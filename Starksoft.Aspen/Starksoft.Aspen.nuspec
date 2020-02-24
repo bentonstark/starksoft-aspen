@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>starksoft.aspen</id>
+    <version>1.1.6</version>
+    <authors>Benton Stark</authors>
+    <owners>Benton Stark</owners>
+    <licenseUrl>https://github.com/bentonstark/starksoft-aspen/blob/master/Starksoft.Aspen/COPYING.LESSER</licenseUrl>
+    <projectUrl>https://github.com/bentonstark/starksoft-aspen</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>.NET / Mono security and cryptography library that provides client support for ftps, gnupg, smartcard, and socks / http proxies</description>
+    <releaseNotes>Bugfix  Fix parsing of filenames with semicolons. Remove unnecessary CRLF after CONNECT message. Make UNIX.owner and UNIX.group facts strings since some servers send the actual names, not the IDs. Handle POSIX-style permissions in the perm fact. Add test cases and expand tests for the parsing fixes.  Moved to VS 2017 and modern NUnit tests.  Fixed GPG import key bug and unit test.</releaseNotes>
+    <copyright>Copyright 2018</copyright>
+    <tags>Smartcard FTP FTPS Proxy Socks GnuPG GPG</tags>
+    <dependencies>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\starksoft.aspen.dll" target="lib\net45" />
+    <file src="bin\Release\starksoft.aspen.pdb" target="lib\net45" />
+  </files>  
+</package>

@@ -17,6 +17,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# deploy directory
+./deploy
+
 # =========================
 # Operating System Files
 # =========================
@@ -39,6 +42,7 @@ $RECYCLE.BIN/
 *.suo
 *.user
 *.sln.docstates
+*.userprefs
 
 # Build results
 [Dd]ebug/
@@ -58,3 +62,11 @@ bld/
 Network Trash Folder
 Temporary Items
 .apdisk
+/packages
+/.vs/Starksoft.Aspen/v15/Server/sqlite3
+
+# Nuget binary files 
+*.nugpkg
+Starksoft.Aspen/starksoft.aspen.1.1.4.nupkg
+
+

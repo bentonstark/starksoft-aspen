@@ -1,21 +1,21 @@
-/*
-* Copyright (c) 2015 Benton Stark
-* This file is part of the Starksoft Aspen library.
-*
-* Starksoft Aspen is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-* 
-* Starksoft Aspen is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
-* along with Starksoft Aspen.  If not, see <http://www.gnu.org/licenses/>.
-*   
-*/
+//
+//  Author:
+//       Benton Stark <benton.stark@gmail.com>
+//
+//  Copyright (c) 2016 Benton Stark
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
 using System.Text;
@@ -49,14 +49,30 @@ namespace Starksoft.Aspen.Proxy
         private string _respText;
         private TcpClient _tcpClient;
         private TcpClient _tcpClientCached;
+        private HttpVersions _httpVersion = HttpVersions.Version1_0;
 
         private const int HTTP_PROXY_DEFAULT_PORT = 8080;
-        private const string HTTP_PROXY_CONNECT_CMD = "CONNECT {0}:{1} HTTP/1.0\r\nHOST {0}:{1}\r\n\r\n";
-        private const string HTTP_PROXY_AUTHENTICATE_CMD = "CONNECT {0}:{1} HTTP/1.0\r\nHOST {0}:{1}\r\nProxy-Authorization: Basic {2}\r\n\r\n";
+        private const string HTTP_PROXY_CONNECT_CMD = "CONNECT {0}:{1} HTTP/{2}\r\nHOST {0}:{1}\r\n\r\n";
+        private const string HTTP_PROXY_AUTHENTICATE_CMD = "CONNECT {0}:{1} HTTP/{3}\r\nHOST {0}:{1}\r\nProxy-Authorization: Basic {2}\r\n\r\n";
 
         private const int WAIT_FOR_DATA_INTERVAL = 50; // 50 ms
         private const int WAIT_FOR_DATA_TIMEOUT = 15000; // 15 seconds
         private const string PROXY_NAME = "HTTP";
+
+        /// <summary>
+        /// HTTP header version enumeration.
+        /// </summary>
+        public enum HttpVersions
+        {
+            /// <summary>
+            /// Specify HTTP/1.0 version in HTTP header requests.
+            /// </summary>
+            Version1_0,
+            /// <summary>
+            /// Specify HTTP/1.1 version in HTTP header requests.
+            /// </summary>
+            Version1_1,
+        }
 
         private enum HttpResponseCodes
         {
@@ -216,6 +232,17 @@ namespace Starksoft.Aspen.Proxy
         }
 
         /// <summary>
+        /// Gets or sets the HTTP header version.  
+        /// Some proxy servers are very picky about the specific HTTP header version specified in the connection and
+        /// authentication strings.  The default is version 1.0 but can be changed to version 1.1.
+        /// </summary>
+        public HttpVersions HttpVersion
+        {
+            get { return _httpVersion;  }
+            set { _httpVersion = value; }
+        }
+
+        /// <summary>
         /// Creates a remote TCP connection through a proxy server to the destination host on the destination port.
         /// </summary>
         /// <param name="destinationHost">Destination host name or IP address.</param>
@@ -327,7 +354,8 @@ namespace Starksoft.Aspen.Proxy
                 //                        concatenated string
                 //[... other HTTP header lines ending with <CR><LF> if required]>
                 //<CR><LF>    // Last Empty Line
-                connectCmd = String.Format(CultureInfo.InvariantCulture, HTTP_PROXY_AUTHENTICATE_CMD, host, port.ToString(CultureInfo.InvariantCulture), auth);
+                connectCmd = String.Format(CultureInfo.InvariantCulture, HTTP_PROXY_AUTHENTICATE_CMD, 
+                    host, port.ToString(CultureInfo.InvariantCulture), auth, GetHttpVersionString());
             }
             else
             {
@@ -337,7 +365,8 @@ namespace Starksoft.Aspen.Proxy
                 //HOST starksoft.com:443<CR><LF>
                 //[... other HTTP header lines ending with <CR><LF> if required]>
                 //<CR><LF>    // Last Empty Line
-                connectCmd = String.Format(CultureInfo.InvariantCulture, HTTP_PROXY_CONNECT_CMD + "\r\n", host, port.ToString(CultureInfo.InvariantCulture));
+                connectCmd = String.Format(CultureInfo.InvariantCulture, HTTP_PROXY_CONNECT_CMD, 
+                    host, port.ToString(CultureInfo.InvariantCulture), GetHttpVersionString());
             }
             return connectCmd;
         }
@@ -410,9 +439,20 @@ namespace Starksoft.Aspen.Proxy
             _respText = line.Substring(end + 1).Trim();
         }
 
+        private String GetHttpVersionString()
+        {
+            switch (_httpVersion)
+            {
+                case HttpVersions.Version1_0:
+                    return "1.0";
+                case HttpVersions.Version1_1:
+                    return "1.1";
+                default:
+                    throw new ProxyException(String.Format("Unexpect HTTP version {0} specified", _httpVersion.ToString()));
+            }
+        }
 
-
-#region "Async Methods"
+        #region "Async Methods"
 
         private BackgroundWorker _asyncWorker;
         private Exception _asyncException;

@@ -1,32 +1,41 @@
 # starksoft-aspen
-security and cryptography library that includes a FTPS client, GnuPG wrapper, Windows smartcard API, and proxy clients
+security and cryptography library that includes a FTPS client, GnuPG wrapper, Windows smart card API, and proxy clients
 
-written in c# under LGPL3 
+Written in c# under LGPL3 and testing under .NET 4.0/4.5 and Mono 4.0/4.5.  Compiles with .NET/Mono 2.0+
+or Visual Studio 2017 on Windows 10.
+
 official repository
 
 nuget image: https://www.nuget.org/packages/starksoft.aspen
 
 Gpg Features
-* executes gpg.exe or gpg2.exe to sign, encrypt, decrypt with streams
-* locates the GPG executable via registery or by user supplied path
+* tested with Linux/Mono or Windows/.NET
+* executes Windows gpg.exe / gpg2.exe or Linux gpg / gpg2 to sign, encrypt, decrypt, verify with streams
 * retrieve a collection or DataSet of the keys
 * output ASCII Armor or Binary
-* optional passphrases when decryption data.
+* optional passphrases when decryption data
 * async methods
+* import public keys
+* select different signing options
 
 Proxy Features
-* SOCKS 4, 4a, 5
+* tested with Linux/Mono or Windows/.NET
+* SOCKS 4, 4a, 5 (with and without authentication)
+* SOCKS5 supports Tor
 * HTTP proxy
 * factory abstraction
 * open sockets supported by creating Tcpclient object and setting TcpClient.Client = socket and passing in the constructor
 
-Smartcard Features
-* p/invoke to WINSCARD.DLL
+Smart card Features
+* low level API for interfacing directly with smart cards
+* works with Windows/.NET only
+* p/invoke to system WINSCARD.DLL
 * send adpu commands to device (send and receive)
 * list readers
 * list cards
 
-Ftpsclient Features
+Ftps client Features
+* tested with Linux/Mono or Windows/.NET
 * FTP RFC 959 and RFC 1579
 * FTP over SSL / TLS
 * asynchronous methods

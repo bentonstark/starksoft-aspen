@@ -4,15 +4,15 @@ using System;
 
 
 [assembly: AssemblyTitle("Starksoft Aspen")]
-[assembly: AssemblyDescription("Cryptography Library")]
+[assembly: AssemblyDescription("Cryptography and Security Library (ftps client, gpg, smart card, proxy client)")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Starksoft, LLC")]
 [assembly: AssemblyProduct("Starksoft Aspen Library")]
-[assembly: AssemblyCopyright("Copyright (c) 2015 Benton Stark")]
+[assembly: AssemblyCopyright("Copyright (c) 2018 Benton Stark")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: AssemblyVersion("1.0.1.0")]
-[assembly: AssemblyFileVersion("1.0.1.0")]
+[assembly: AssemblyVersion("1.1.6.1")]
+[assembly: AssemblyFileVersion("1.1.6.1")]
 [assembly: AssemblyDelaySign(false)]
 [assembly: AssemblyKeyName("")]
 

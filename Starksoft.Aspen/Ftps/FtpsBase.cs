@@ -1,21 +1,21 @@
-/*
-* Copyright (c) 2015 Benton Stark
-* This file is part of the Starksoft Aspen library.
-*
-* Starksoft Aspen is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-* 
-* Starksoft Aspen is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
-* along with Starksoft Aspen.  If not, see <http://www.gnu.org/licenses/>.
-*   
-*/
+//
+//  Author:
+//       Benton Stark <benton.stark@gmail.com>
+//
+//  Copyright (c) 2016 Benton Stark
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
 using System.Net;
@@ -146,6 +146,20 @@ namespace Starksoft.Aspen.Ftps
         /// </summary>
         None,
         /// <summary>
+        /// Specifies Transport Layer Security (TLS) version 1.2 is required to secure communciations in explicit mode.  The TLS 1.2 protocol is defined in IETF RFC 5246 and supercedes the TLS 1.1 protocol.
+        /// </summary>
+        /// <remarks>
+        /// The AUTH TLS command is sent to the FTP server to secure the connection.  
+        /// </remarks>
+        Tls12Explicit,
+        /// <summary>
+        /// Specifies Transport Layer Security (TLS) version 1.1 is required to secure communciations in explicit mode.  The TLS 1.1 protocol is defined in IETF RFC 4346 and supercedes the TLS 1.0 protocol.
+        /// </summary>
+        /// <remarks>
+        /// The AUTH TLS command is sent to the FTP server to secure the connection.  
+        /// </remarks>
+        Tls11Explicit,
+        /// <summary>
         /// Specifies Transport Layer Security (TLS) version 1.0 is required to secure communciations.  The TLS protocol is defined in IETF RFC 2246 and supercedes the SSL 3.0 protocol.
         /// </summary>
         /// <remarks>
@@ -184,6 +198,22 @@ namespace Starksoft.Aspen.Ftps
         /// protocol Ssl3, otherwise specify Tls1.
         /// </remarks>
         Ssl2Explicit,
+        /// <summary>
+        /// Specifies Transport Layer Security (TLS) version 1.2 is required to secure communciations in explicit mode.  The TLS 1.2 protocol is defined in IETF RFC 5246 and supercedes the TLS 1.1 protocol.
+        /// </summary>
+        /// <remarks>
+        /// The AUTH TLS command is sent to the FTP server to secure the connection.  TLS protocol is the latest version of the SSL protcol and is the security protocol that should be used whenever possible.
+        /// There are slight differences between SSL version 3.0 and TLS version 1.0, but the protocol remains substantially the same.
+        /// </remarks>
+        Tls12Implicit,
+        /// <summary>
+        /// Specifies Transport Layer Security (TLS) version 1.1 is required to secure communciations in explicit mode.  The TLS 1.1 protocol is defined in IETF RFC 4346 and supercedes the TLS 1.0 protocol.
+        /// </summary>
+        /// <remarks>
+        /// The AUTH TLS command is sent to the FTP server to secure the connection.  TLS protocol is the latest version of the SSL protcol and is the security protocol that should be used whenever possible.
+        /// There are slight differences between SSL version 3.0 and TLS version 1.0, but the protocol remains substantially the same.
+        /// </remarks>
+        Tls11Implicit,
         /// <summary>
         /// Specifies Transport Layer Security (TLS) version 1.0 is required to secure communciations in explicit mode.  The TLS protocol is defined in IETF RFC 2246 and supercedes the SSL 3.0 protocol.
         /// </summary>
@@ -552,6 +582,10 @@ namespace Starksoft.Aspen.Ftps
         // data compresion specific
         private bool _isCompressionEnabled = false;  // default is no compression
 
+        // SSL/TSL PROT P command option
+        // default requirement for implicit TLS for Filezilla
+        private bool _sendProtPForImplicitSslConnections = true;
+
         // data hashing specific
         private HashingAlgorithm _autoHashAlgorithm = HashingAlgorithm.None; // default is no compression (zlib)
 
@@ -575,8 +609,8 @@ namespace Starksoft.Aspen.Ftps
         // constant definitions
         private const int TCP_BUFFER_SIZE = 8192; 
         private const int TCP_TIMEOUT = 30000; // 30 seconds
-        private const int WAIT_FOR_DATA_INTERVAL = 100; // 100 ms
-        private const int WAIT_FOR_COMMAND_RESPONSE_INTERVAL = 100; // 100 ms
+        private const int WAIT_FOR_DATA_INTERVAL = 10; // 10 ms
+        private const int WAIT_FOR_COMMAND_RESPONSE_INTERVAL = 20; // 20 ms
         private const int TRANSFER_TIMEOUT = 30000; // 30 seconds
         private const int COMMAND_TIMEOUT = 30000; // 30 seconds
         private const string HASH_CRC_32 = "CRC-32";
@@ -803,8 +837,9 @@ namespace Starksoft.Aspen.Ftps
             if (!_feats.Contains(FtpsCmd.Hash))
                 throw new FtpsCommandNotSupportedException("Cannot set the HASH option on FTP server.", FtpsCmd.Hash);
 
-            // get the hash argument feature from the features collection
-            FtpsFeatureArgument fa = GetHashFeatureArgument(algorithm);
+            // attempt to get the hash argument feature from the features collection
+            // if the feature or algorithm is not available an exception will be thrown
+            GetHashFeatureArgument(algorithm);
 
             string hashArgText = ConvertHashAlgoToTextArg(algorithm);
 
@@ -822,8 +857,8 @@ namespace Starksoft.Aspen.Ftps
             // refresh the features collection
             TryResetFeatures();
             // find the Hash feature argument agains and verify the option has been set properly
-            FtpsFeatureArgument fa2 = GetHashFeatureArgument(algorithm);    
-            if (!fa2.IsDefault)
+            FtpsFeatureArgument fa = GetHashFeatureArgument(algorithm);    
+            if (!fa.IsDefault)
                 throw new FtpsHashingException("Hashing option not set to default by FTP server.");
         }
 
@@ -1441,8 +1476,9 @@ namespace Starksoft.Aspen.Ftps
                 catch (SocketException e)
                 {
                     // 10035 == WSAEWOULDBLOCK
-                    if (!e.NativeErrorCode.Equals(10035))
+                    if (!e.NativeErrorCode.Equals (10035)) {
                         connected = false;
+                    }
                 }
                 catch (ObjectDisposedException)
                 { }
@@ -1497,9 +1533,36 @@ namespace Starksoft.Aspen.Ftps
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="Starksoft.Aspen.Ftps.FtpsBase"/> send prot P for implicit
+        /// ssl connections.
+        /// </summary>
+        /// <remarks>
+        /// Filezilla requires by default PROT P for implicit TLS connections unless disabled in the server settings.  Set
+        /// this option to false if the server you are connecting to can not accept PROT P for implicit connections.
+        /// </remarks>
+        /// <value><c>true</c> if send prot P for implicit ssl connections; otherwise, <c>false</c>.</value>
+        public bool SendProtPForImplicitSslConnections
+        {
+            get { return _sendProtPForImplicitSslConnections; }
+            set { 
+                if (this.IsConnected)
+                    throw new FtpsException("SendProtPForImplicitSslConnections property value cannot be changed when the connection is open.");
+                _sendProtPForImplicitSslConnections = value; 
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the internal character encoding object use to encode the request and response data.
         /// </summary>
-        internal Encoding Encoding
+        /// <remarks>
+        /// The encoding object used for character encoding when communicating with the FTP server
+        /// is managed by the FtpsClient.  If the FTP server your are connecting to has a different encoding
+        /// standard then the client machine, you can override the default behavior with a custom encoding object
+        /// which the FtpsClient will then use instead of the default client Encoding object.  An example would be
+        /// a US english client connecting to a FTP server than contains French UTF-8 encoding characters
+        /// in file names or directories on the FTP server.
+        /// </remarks>
+        public Encoding Encoding
         {
             get { return _encode; }
             set { _encode = value; }
@@ -1626,13 +1689,17 @@ namespace Starksoft.Aspen.Ftps
             if (_securityProtocol == FtpsSecurityProtocol.Ssl2Explicit 
                 || _securityProtocol == FtpsSecurityProtocol.Ssl3Explicit 
                 || _securityProtocol == FtpsSecurityProtocol.Tls1Explicit 
-                || _securityProtocol == FtpsSecurityProtocol.Tls1OrSsl3Explicit)
+                || _securityProtocol == FtpsSecurityProtocol.Tls1OrSsl3Explicit
+                || _securityProtocol == FtpsSecurityProtocol.Tls11Explicit
+                || _securityProtocol == FtpsSecurityProtocol.Tls12Explicit)
                 CreateSslExplicitCommandStream();
 
             if (_securityProtocol == FtpsSecurityProtocol.Ssl2Implicit 
                 || _securityProtocol == FtpsSecurityProtocol.Ssl3Implicit 
                 || _securityProtocol == FtpsSecurityProtocol.Tls1Implicit 
-                || _securityProtocol == FtpsSecurityProtocol.Tls1OrSsl3Implicit)
+                || _securityProtocol == FtpsSecurityProtocol.Tls1OrSsl3Implicit
+                || _securityProtocol == FtpsSecurityProtocol.Tls11Implicit
+                || _securityProtocol == FtpsSecurityProtocol.Tls12Implicit)
                 CreateSslImplicitCommandStream();
 
             // test to see if this is an asychronous operation and if so make sure 
@@ -1863,6 +1930,7 @@ namespace Starksoft.Aspen.Ftps
                 
                 // throttle the transfer if necessary
                 ThrottleByteTransfer(maxBytesPerSecond, bytesTotal, elapsed, bytesPerSec);
+
             } ;
 
             //  if the consumer subscribes to transfer complete event then fire it
@@ -2045,12 +2113,19 @@ namespace Starksoft.Aspen.Ftps
             byte[] buffer = new byte[_tcpBufferSize];
             StringBuilder response = new StringBuilder();
             bool code421Detected = false;
+            long cycles = 0;
 
             while (IsConnected)
             {
+                // every 100 cycle sleep to give a chance for the lock
+                // to be shared with the competing threads
+                if (cycles++ % 100 == 0) {
+                    cycles = 0; // reset cycles so we don't have a possible overflow 
+                    Thread.Sleep(WAIT_FOR_COMMAND_RESPONSE_INTERVAL);
+                }
+
                 lock (_reponseMonitorLock)
                 {
-                    Thread.Sleep(WAIT_FOR_COMMAND_RESPONSE_INTERVAL);
                     try
                     {
                         if (_commandConn != null && _commandConn.GetStream().DataAvailable)
@@ -2445,7 +2520,17 @@ namespace Starksoft.Aspen.Ftps
             switch (_networkProtocol)
             {
                 case NetworkVersion.IPv4:
-                    SendPasvCmd(out host, out port);
+                    // some FileZilla servers appear to allow EPSV but not PASV even on IPv4 so we test
+                    // for EPSV support and if available use it; otherwise use PASV
+                    if (Features.Count > 0 && Features.Contains(FtpsCmd.Epsv) && !Features.Contains(FtpsCmd.Pasv))
+                    {
+                        SendEpsvCmd(out host, out port); 
+                    }
+                    else
+                    {
+                        SendPasvCmd(out host, out port);
+                    }
+
                     break;
                 case NetworkVersion.IPv6:
                     SendEpsvCmd(out host, out port);
@@ -2592,6 +2677,14 @@ namespace Starksoft.Aspen.Ftps
                 case FtpsSecurityProtocol.Tls1Implicit:
                     protocol = SslProtocols.Tls;
                     break;
+                case FtpsSecurityProtocol.Tls11Explicit:
+                case FtpsSecurityProtocol.Tls11Implicit:
+                    protocol = SslProtocols.Tls11;
+                    break;
+                case FtpsSecurityProtocol.Tls12Explicit:
+                case FtpsSecurityProtocol.Tls12Implicit:
+                    protocol = SslProtocols.Tls12;
+                    break;
                 default:
                     throw new FtpsSecureConnectionException(String.Format("unexpected FtpSecurityProtocol type '{0}'", _securityProtocol.ToString()));
             }
@@ -2665,6 +2758,8 @@ namespace Starksoft.Aspen.Ftps
                         authCommand = "SSL";
                         break;
                     case FtpsSecurityProtocol.Tls1Explicit:
+                    case FtpsSecurityProtocol.Tls11Explicit:
+                    case FtpsSecurityProtocol.Tls12Explicit:
                         authCommand = "TLS";
                         break;
                 }
@@ -2679,6 +2774,7 @@ namespace Starksoft.Aspen.Ftps
                     _commandStream = CreateSslStream(_commandConn.GetStream());
                 }
 
+                // send a command to the FTP server indicating that traffic is now protected
                 SendRequest(new FtpsRequest(_encode, FtpsCmd.Pbsz, "0"));
                 SendRequest(new FtpsRequest(_encode, FtpsCmd.Prot, "P"));
             }
@@ -2701,6 +2797,11 @@ namespace Starksoft.Aspen.Ftps
                 lock (_reponseMonitorLock)
                 {
                     _commandStream = CreateSslStream(_commandConn.GetStream());
+                }
+
+                // send a command to the FTP server indicating that traffic is now protected
+                if (_sendProtPForImplicitSslConnections) {
+                    SendRequest(new FtpsRequest(_encode, FtpsCmd.Prot, "P"));
                 }
             }
             catch (FtpsAuthenticationException fauth)
@@ -2776,7 +2877,7 @@ namespace Starksoft.Aspen.Ftps
             return zstream;
         }
 
-        private FtpsFeatureArgument GetHashFeatureArgument(HashingAlgorithm algo)
+         private FtpsFeatureArgument GetHashFeatureArgument(HashingAlgorithm algo)
         {
             string argText = ConvertHashAlgoToTextArg(algo);
 
@@ -2829,7 +2930,7 @@ namespace Starksoft.Aspen.Ftps
             }
         }
         
-        internal bool IsTranferProgressEventSet()
+        internal bool IsTransferProgressEventSet()
         {
             return (TransferProgress != null) ? true : false;
         }
