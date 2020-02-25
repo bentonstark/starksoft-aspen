@@ -25,10 +25,12 @@ namespace Demo
             StreamReader reader = new StreamReader(output);
             string text = reader.ReadToEnd();
             MemoryStream outputVer = new MemoryStream();
-            gpg.Verify(output, outputVer);
+            var verifiedKey = gpg.Verify(output, outputVer);
             outputVer.Position = 0;
             StreamReader reader2 = new StreamReader(outputVer);
             string text2 = reader2.ReadToEnd();
+            Console.WriteLine("Found key " + verifiedKey);
+            Console.WriteLine("Output: " + text2);
             Console.ReadKey();
         }
     }
