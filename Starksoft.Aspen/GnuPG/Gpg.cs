@@ -27,6 +27,7 @@ using Microsoft.Win32;
 using System.Collections;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
+using System.Linq;
 
 namespace Starksoft.Aspen.GnuPG
 {
@@ -337,6 +338,41 @@ namespace Starksoft.Aspen.GnuPG
         }
 
         /// <summary>
+        /// Throw exceptions when streams are not valid 
+        /// </summary>
+        /// <param name="inputStream"></param>
+        /// <param name="outputStream"></param>
+        private void ValidateInputOutputStreams(Stream inputStream, Stream outputStream)
+        {
+            if (inputStream == null)
+                throw new ArgumentNullException("Argument inputStream can not be null.");
+
+            if (outputStream == null)
+                throw new ArgumentNullException("Argument outputStream can not be null.");
+
+            if (!inputStream.CanRead)
+                throw new ArgumentException("Argument inputStream must be readable.");
+
+            if (!outputStream.CanWrite)
+                throw new ArgumentException("Argument outputStream must be writable.");
+        }
+
+        /// <summary>
+        /// Throw exceptions when stream is not valid 
+        /// </summary>
+        /// <param name="inputStream"></param>
+
+        private void ValidateInputStream(Stream inputStream)
+        {
+            if (inputStream == null)
+                throw new ArgumentNullException("Argument inputStream can not be null.");
+
+            if (!inputStream.CanRead)
+                throw new ArgumentException("Argument inputStream must be readable.");
+        }
+
+
+        /// <summary>
         /// Sign + encrypt data using the gpg executable with --sign arg.  Input data is provide via a stream.  Output
         /// data is returned as a stream.  Note that MemoryStream is supported for use.
         /// </summary>
@@ -344,15 +380,7 @@ namespace Starksoft.Aspen.GnuPG
         /// <param name="outputStream">Output stream which will contain encrypted data.</param>
         public void SignAndEncrypt(Stream inputStream, Stream outputStream)
         {
-            if (inputStream == null)
-                throw new ArgumentNullException("Argument inputStream can not be null.");
-            if (outputStream == null)
-                throw new ArgumentNullException("Argument outputStream can not be null.");
-            if (!inputStream.CanRead)
-                throw new ArgumentException("Argument inputStream must be readable.");
-            if (!outputStream.CanWrite)
-                throw new ArgumentException("Argument outputStream must be writable.");
-
+            ValidateInputOutputStreams(inputStream, outputStream);
             ExecuteGpg(ActionTypes.SignEncrypt, inputStream, outputStream);
         }
 
@@ -368,15 +396,7 @@ namespace Starksoft.Aspen.GnuPG
         /// </remarks>
         public void Encrypt(Stream inputStream, Stream outputStream)
         {
-            if (inputStream == null)
-                throw new ArgumentNullException("Argument inputStream can not be null.");
-            if (outputStream == null)
-                throw new ArgumentNullException("Argument outputStream can not be null.");
-            if (!inputStream.CanRead)
-                throw new ArgumentException("Argument inputStream must be readable.");
-            if (!outputStream.CanWrite)
-                throw new ArgumentException("Argument outputStream must be writable.");
-
+           ValidateInputOutputStreams(inputStream, outputStream);
             ExecuteGpg(ActionTypes.Encrypt, inputStream, outputStream);
         }
 
@@ -391,15 +411,7 @@ namespace Starksoft.Aspen.GnuPG
         /// </remarks>
         public void Decrypt(Stream inputStream, Stream outputStream)
         {
-            if (inputStream == null)
-                throw new ArgumentNullException("Argument inputStream can not be null.");
-            if (outputStream == null)
-                throw new ArgumentNullException("Argument outputStream can not be null.");
-            if (!inputStream.CanRead)
-                throw new ArgumentException("Argument inputStream must be readable.");
-            if (!outputStream.CanWrite)
-                throw new ArgumentException("Argument outputStream must be writable.");
-            
+            ValidateInputOutputStreams(inputStream, outputStream);
             ExecuteGpg(ActionTypes.Decrypt, inputStream, outputStream);
         }
 
@@ -414,15 +426,7 @@ namespace Starksoft.Aspen.GnuPG
         /// </remarks>
         public void Sign(Stream inputStream, Stream outputStream)
         {
-            if (inputStream == null)
-                throw new ArgumentNullException("Argument inputStream can not be null.");
-            if (outputStream == null)
-                throw new ArgumentNullException("Argument outputStream can not be null.");
-            if (!inputStream.CanRead)
-                throw new ArgumentException("Argument inputStream must be readable.");
-            if (!outputStream.CanWrite)
-                throw new ArgumentException("Argument outputStream must be writable.");
-
+            ValidateInputOutputStreams(inputStream, outputStream);
             ExecuteGpg(ActionTypes.Sign, inputStream, outputStream);
         }
 
@@ -432,16 +436,60 @@ namespace Starksoft.Aspen.GnuPG
         /// <param name="inputStream">Input stream containing signed data to verify.</param>
         public void Verify(Stream inputStream)
         {
-            if (inputStream == null)
-                throw new ArgumentNullException("Argument inputStream can not be null.");
-            if (!inputStream.CanRead)
-                throw new ArgumentException("Argument inputStream must be readable.");
+            ValidateInputStream(inputStream);
             if (inputStream.Position == inputStream.Length)
                 throw new ArgumentException ("Argument inputStream position cannot be set to the end.  Nothing to read.");
 
             ExecuteGpg(ActionTypes.Verify, inputStream, new MemoryStream());
         }
 
+        /// <summary>
+        /// Verify signed input stream data with default user key. Provides extra data.
+        /// </summary>
+        /// <param name="inputStream">Input stream containing signed data to verify.</param>
+        /// <param name="outputStream">Output stream containing raw data.</param>
+        /// <returns>Key ID for verified user</returns>
+        public string Verify(Stream inputStream, Stream outputStream)
+        {
+            ValidateInputOutputStreams(inputStream, outputStream);
+            inputStream.Position = 0;
+            ExecuteGpg(ActionTypes.Verify, inputStream, outputStream);
+            outputStream.Position = 0;
+            StreamReader reader = new StreamReader(outputStream);
+            string text = reader.ReadToEnd();
+            return GetKeyIdFromVerifyOutput(text);
+        }
+
+        /// <summary>
+        /// Key is last word on first line of verify output if this value is correct key value (hex number)
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns>Key id</returns>
+        private string GetKeyIdFromVerifyOutput(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return null;
+            var lines = text.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None);
+            var IdCandidate = lines[0].Split(new[] {" "}, StringSplitOptions.None).Last();
+            if (IsCorrectHashKey(IdCandidate))
+            {
+                return IdCandidate;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Check if keyId is correct key
+        /// </summary>
+        /// <param name="keyId">key to check</param>
+        /// <returns></returns>
+        public static bool IsCorrectHashKey(string keyId)
+        {
+            if (string.IsNullOrWhiteSpace(keyId)) return false;
+            const string hashRegex = "^[a-fA-F0-9]+$";
+            Match match = Regex.Match(keyId, hashRegex);
+            return match.Success;
+        }
         /// <summary>
         /// Retrieves a collection of all secret keys.
         /// </summary>
@@ -750,11 +798,12 @@ namespace Starksoft.Aspen.GnuPG
                     StreamReader rerror = new StreamReader(_errorStream);
                     _errorStream.Position = 0;
                     gpgErrorText = rerror.ReadToEnd();
-                }        
+                }
 
-                // key name is output to error stream so read from the error stream and write out
+              
+                // key name and verification output are output to error stream so read from the error stream and write out
                 // to the output stream
-                if (action == ActionTypes.Import)
+                if (action == ActionTypes.Import || action == ActionTypes.Verify)
                 {
                     _errorStream.Position = 0;
                     byte[] buffer = new byte[4048];
