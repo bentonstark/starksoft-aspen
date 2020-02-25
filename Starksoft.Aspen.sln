@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.960
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Starksoft.Aspen", "Starksoft.Aspen\Starksoft.Aspen.csproj", "{5F228FCD-54F1-491D-93CE-3D768655FADC}"
 EndProject
@@ -12,29 +12,39 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "Demo\Demo.csproj", "{06B52D6A-1660-443A-94B0-6693F93B5EFA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{08312AE3-C8D0-419A-86F4-C6D2B228722F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{08312AE3-C8D0-419A-86F4-C6D2B228722F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{08312AE3-C8D0-419A-86F4-C6D2B228722F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{08312AE3-C8D0-419A-86F4-C6D2B228722F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5F228FCD-54F1-491D-93CE-3D768655FADC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5F228FCD-54F1-491D-93CE-3D768655FADC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F228FCD-54F1-491D-93CE-3D768655FADC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F228FCD-54F1-491D-93CE-3D768655FADC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08312AE3-C8D0-419A-86F4-C6D2B228722F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08312AE3-C8D0-419A-86F4-C6D2B228722F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08312AE3-C8D0-419A-86F4-C6D2B228722F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08312AE3-C8D0-419A-86F4-C6D2B228722F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06B52D6A-1660-443A-94B0-6693F93B5EFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06B52D6A-1660-443A-94B0-6693F93B5EFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06B52D6A-1660-443A-94B0-6693F93B5EFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06B52D6A-1660-443A-94B0-6693F93B5EFA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BD536F15-2A71-4569-9260-C7935804F4D6}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = None
 		$1.ResourceNamePolicy = FileFormatDefault
-		$0.TextStylePolicy = $2
+		$0.TextStylePolicy = $4
 		$2.inheritsSet = VisualStudio
 		$2.inheritsScope = text/plain
 		$2.scope = text/x-csharp
@@ -66,7 +76,6 @@ Global
 		$3.inheritsSet = Mono
 		$3.inheritsScope = text/x-csharp
 		$3.scope = text/x-csharp
-		$0.TextStylePolicy = $4
 		$4.FileWidth = 120
 		$4.TabsToSpaces = False
 		$4.inheritsSet = VisualStudio
@@ -77,21 +86,19 @@ Global
 		$5.IncludeInNewFiles = True
 		$0.NameConventionPolicy = $6
 		$6.Rules = $7
-		$7.NamingRule = $8
+		$7.NamingRule = $27
 		$8.Name = Namespaces
 		$8.AffectedEntity = Namespace
 		$8.VisibilityMask = VisibilityMask
 		$8.NamingStyle = PascalCase
 		$8.IncludeInstanceMembers = True
 		$8.IncludeStaticEntities = True
-		$7.NamingRule = $9
 		$9.Name = Types
 		$9.AffectedEntity = Class, Struct, Enum, Delegate
 		$9.VisibilityMask = Public
 		$9.NamingStyle = PascalCase
 		$9.IncludeInstanceMembers = True
 		$9.IncludeStaticEntities = True
-		$7.NamingRule = $10
 		$10.Name = Interfaces
 		$10.RequiredPrefixes = $11
 		$11.String = I
@@ -100,7 +107,6 @@ Global
 		$10.NamingStyle = PascalCase
 		$10.IncludeInstanceMembers = True
 		$10.IncludeStaticEntities = True
-		$7.NamingRule = $12
 		$12.Name = Attributes
 		$12.RequiredSuffixes = $13
 		$13.String = Attribute
@@ -109,7 +115,6 @@ Global
 		$12.NamingStyle = PascalCase
 		$12.IncludeInstanceMembers = True
 		$12.IncludeStaticEntities = True
-		$7.NamingRule = $14
 		$14.Name = Event Arguments
 		$14.RequiredSuffixes = $15
 		$15.String = EventArgs
@@ -118,7 +123,6 @@ Global
 		$14.NamingStyle = PascalCase
 		$14.IncludeInstanceMembers = True
 		$14.IncludeStaticEntities = True
-		$7.NamingRule = $16
 		$16.Name = Exceptions
 		$16.RequiredSuffixes = $17
 		$17.String = Exception
@@ -127,70 +131,60 @@ Global
 		$16.NamingStyle = PascalCase
 		$16.IncludeInstanceMembers = True
 		$16.IncludeStaticEntities = True
-		$7.NamingRule = $18
 		$18.Name = Methods
 		$18.AffectedEntity = Methods
 		$18.VisibilityMask = Protected, Public
 		$18.NamingStyle = PascalCase
 		$18.IncludeInstanceMembers = True
 		$18.IncludeStaticEntities = True
-		$7.NamingRule = $19
 		$19.Name = Static Readonly Fields
 		$19.AffectedEntity = ReadonlyField
 		$19.VisibilityMask = Protected, Public
 		$19.NamingStyle = PascalCase
 		$19.IncludeInstanceMembers = False
 		$19.IncludeStaticEntities = True
-		$7.NamingRule = $20
 		$20.Name = Fields
 		$20.AffectedEntity = Field
 		$20.VisibilityMask = Protected, Public
 		$20.NamingStyle = PascalCase
 		$20.IncludeInstanceMembers = True
 		$20.IncludeStaticEntities = True
-		$7.NamingRule = $21
 		$21.Name = ReadOnly Fields
 		$21.AffectedEntity = ReadonlyField
 		$21.VisibilityMask = Protected, Public
 		$21.NamingStyle = PascalCase
 		$21.IncludeInstanceMembers = True
 		$21.IncludeStaticEntities = False
-		$7.NamingRule = $22
 		$22.Name = Constant Fields
 		$22.AffectedEntity = ConstantField
 		$22.VisibilityMask = Protected, Public
 		$22.NamingStyle = PascalCase
 		$22.IncludeInstanceMembers = True
 		$22.IncludeStaticEntities = True
-		$7.NamingRule = $23
 		$23.Name = Properties
 		$23.AffectedEntity = Property
 		$23.VisibilityMask = Protected, Public
 		$23.NamingStyle = PascalCase
 		$23.IncludeInstanceMembers = True
 		$23.IncludeStaticEntities = True
-		$7.NamingRule = $24
 		$24.Name = Events
 		$24.AffectedEntity = Event
 		$24.VisibilityMask = Protected, Public
 		$24.NamingStyle = PascalCase
 		$24.IncludeInstanceMembers = True
 		$24.IncludeStaticEntities = True
-		$7.NamingRule = $25
 		$25.Name = Enum Members
 		$25.AffectedEntity = EnumMember
 		$25.VisibilityMask = VisibilityMask
 		$25.NamingStyle = PascalCase
 		$25.IncludeInstanceMembers = True
 		$25.IncludeStaticEntities = True
-		$7.NamingRule = $26
 		$26.Name = Parameters
 		$26.AffectedEntity = Parameter
 		$26.VisibilityMask = VisibilityMask
 		$26.NamingStyle = CamelCase
 		$26.IncludeInstanceMembers = True
 		$26.IncludeStaticEntities = True
-		$7.NamingRule = $27
 		$27.Name = Type Parameters
 		$27.RequiredPrefixes = $28
 		$28.String = T
@@ -202,8 +196,5 @@ Global
 		$0.VersionControlPolicy = $29
 		$29.inheritsSet = Mono
 		version = 1.1.2
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
