@@ -795,7 +795,7 @@ namespace Starksoft.Aspen.GnuPG
                 //  if the process exit code is not 0 then read the error text from the gpg.exe process 
                 if (_proc.ExitCode != 0 && !_ignoreErrors)
                 {
-                    StreamReader rerror = new StreamReader(_errorStream);
+                    StreamReader rerror = new StreamReader(_errorStream, _proc.StandardError.CurrentEncoding);
                     _errorStream.Position = 0;
                     gpgErrorText = rerror.ReadToEnd();
                 }

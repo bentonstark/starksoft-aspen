@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2024
+VisualStudioVersion = 15.0.28307.960
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Starksoft.Aspen", "Starksoft.Aspen\Starksoft.Aspen.csproj", "{5F228FCD-54F1-491D-93CE-3D768655FADC}"
 EndProject
@@ -10,9 +10,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{07F09099-0395-4667-A104-92F1ABA9161E}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
-		Starksoft.Aspen\Properties\Settings.Designer.cs = Starksoft.Aspen\Properties\Settings.Designer.cs
-		Starksoft.Aspen\Properties\Settings.settings = Starksoft.Aspen\Properties\Settings.settings
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "Demo\Demo.csproj", "{06B52D6A-1660-443A-94B0-6693F93B5EFA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,12 +28,16 @@ Global
 		{08312AE3-C8D0-419A-86F4-C6D2B228722F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08312AE3-C8D0-419A-86F4-C6D2B228722F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08312AE3-C8D0-419A-86F4-C6D2B228722F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06B52D6A-1660-443A-94B0-6693F93B5EFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06B52D6A-1660-443A-94B0-6693F93B5EFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06B52D6A-1660-443A-94B0-6693F93B5EFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06B52D6A-1660-443A-94B0-6693F93B5EFA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {54AC58BD-9476-4F6B-8F5F-F25D581DD226}
+		SolutionGuid = {379B15ED-3978-468F-9333-9E7768D742B5}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
