@@ -149,9 +149,10 @@ namespace Starksoft.Aspen.GnuPG
         private long _copyBufferSize = DEFAULT_COPY_BUFFER_SIZE;
         private bool _ignoreErrors;
         private string _userOptions;
-
         private Stream _outputStream;
         private Stream _errorStream;
+        private Encoding _defaultEncoding = null;
+        private Encoding _loadedStreamEncoding;
 
         /// <summary>
         /// GnuPG actions.
@@ -338,6 +339,16 @@ namespace Starksoft.Aspen.GnuPG
         }
 
         /// <summary>
+        /// Set to console default when you are using wpf app to avoid problem with recoding
+        /// if console default is different than WPF default
+        /// </summary>
+        public Encoding DefaultEncoding
+        {
+            get { return _defaultEncoding; }
+            set { _defaultEncoding = value; }
+        }
+
+        /// <summary>
         /// Throw exceptions when streams are not valid 
         /// </summary>
         /// <param name="inputStream"></param>
@@ -455,7 +466,7 @@ namespace Starksoft.Aspen.GnuPG
             inputStream.Position = 0;
             ExecuteGpg(ActionTypes.Verify, inputStream, outputStream);
             outputStream.Position = 0;
-            StreamReader reader = new StreamReader(outputStream);
+            StreamReader reader = new StreamReader(outputStream, _loadedStreamEncoding);
             string text = reader.ReadToEnd();
             return GetKeyIdFromVerifyOutput(text);
         }
@@ -525,7 +536,16 @@ namespace Starksoft.Aspen.GnuPG
             {
                 ExecuteGpg(ActionTypes.Import, inputStream, outputStream);
                 outputStream.Seek(0, SeekOrigin.Begin);
-                StreamReader sr = new StreamReader(outputStream);
+                StreamReader sr;
+                if (DefaultEncoding == null)
+                {
+                    sr = new StreamReader(outputStream);
+                }
+                else
+                {
+                    sr = new StreamReader(outputStream, DefaultEncoding);
+                }
+              
                 string line;
                 while ((line = sr.ReadLine()) != null)
                 {
@@ -580,7 +600,11 @@ namespace Starksoft.Aspen.GnuPG
             procInfo.RedirectStandardInput = true;
             procInfo.RedirectStandardOutput = true;
             procInfo.RedirectStandardError = true;
-
+            if (DefaultEncoding != null)
+            {
+                procInfo.StandardErrorEncoding = DefaultEncoding;
+                procInfo.StandardOutputEncoding = DefaultEncoding;
+            }
             // create a memory stream to hold the output in memory
             MemoryStream outputStream = new MemoryStream();
 
@@ -608,7 +632,15 @@ namespace Starksoft.Aspen.GnuPG
             }
 
             // reset the stream position and return as a StreamReader
-            StreamReader reader = new StreamReader(outputStream);
+            StreamReader reader;
+            if (DefaultEncoding == null)
+            {
+                reader = new StreamReader(outputStream);
+            }
+            else
+            {
+                reader = new StreamReader(outputStream, DefaultEncoding);
+            }
             reader.BaseStream.Position = 0;
             return reader;
         }
@@ -750,6 +782,11 @@ namespace Starksoft.Aspen.GnuPG
             procInfo.RedirectStandardInput = true;
             procInfo.RedirectStandardOutput = true;
             procInfo.RedirectStandardError = true;
+            if (DefaultEncoding != null)
+            {
+                procInfo.StandardErrorEncoding = DefaultEncoding;
+                procInfo.StandardOutputEncoding = DefaultEncoding;
+            }
 
             try
             {
@@ -761,7 +798,7 @@ namespace Starksoft.Aspen.GnuPG
 
                 _outputStream = outputStream;
                 _errorStream = new MemoryStream();
-
+                _loadedStreamEncoding = _proc.StandardError.CurrentEncoding;
                 // set up threads to run the output stream and error stream asynchronously
                 ThreadStart outputEntry = new ThreadStart(AsyncOutputReader);
                 Thread outputThread = new Thread(outputEntry);
@@ -795,7 +832,7 @@ namespace Starksoft.Aspen.GnuPG
                 //  if the process exit code is not 0 then read the error text from the gpg.exe process 
                 if (_proc.ExitCode != 0 && !_ignoreErrors)
                 {
-                    StreamReader rerror = new StreamReader(_errorStream, _proc.StandardError.CurrentEncoding);
+                    StreamReader rerror = new StreamReader(_errorStream, _loadedStreamEncoding);
                     _errorStream.Position = 0;
                     gpgErrorText = rerror.ReadToEnd();
                 }
